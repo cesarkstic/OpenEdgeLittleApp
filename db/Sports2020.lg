@@ -1,0 +1,50 @@
+
+                Wed Aug 27 12:06:37 2025
+[2025/08/27@12:06:37.163-0500] P-9364       T-23248 I DBUTIL   : (451)   prostrct create session begin for cdcas on CON:. 
+[2025/08/27@12:06:37.168-0500] P-9364       T-23248 I DBUTIL   : (12862) Structure file C:\OpenEdge\WRK\OpenEdgeLittleApp\db\Sports2020.st used to create database with blocksize 8192. 
+[2025/08/27@12:06:37.170-0500] P-9364       T-23248 I DBUTIL   : (334)   prostrct create session end. 
+[2025/08/27@12:06:37.184-0500] P-9364       T-23248 I DBUTIL   : (451)   procopy session begin for cdcas on CON:. 
+[2025/08/27@12:06:37.291-0500] P-9364       T-23248 I DBUTIL   : (334)   procopy session end. 
+
+                Wed Aug 27 12:06:37 2025
+[2025/08/27@12:06:37.324-0500] P-9364       T-23248 I DBUTIL   : (451)   procopy get default SQL DBA session begin for cdcas on CON:. 
+[2025/08/27@12:06:37.324-0500] P-9364       T-23248 I DBUTIL   : (15321) Before Image Log Initialization at block 0  offset 0. 
+[2025/08/27@12:06:37.355-0500] P-9364       T-23248 I DBUTIL   : (14867) Procopy -newinstance Created a new database GUID. 
+[2025/08/27@12:06:37.360-0500] P-9364       T-23248 I DBUTIL   : (15109) At Database close the number of live transactions is 0. 
+[2025/08/27@12:06:37.361-0500] P-9364       T-23248 I DBUTIL   : (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/27@12:06:37.364-0500] P-9364       T-23248 I DBUTIL   : (334)   procopy get default SQL DBA session end. 
+
+                Wed Aug 27 12:08:26 2025
+[2025/08/27@12:08:26.439-0500] P-23096      T-22024 I DBUTIL   : (451)   procopy session begin for cdcas on CON:. 
+[2025/08/27@12:08:26.511-0500] P-23096      T-22024 I DBUTIL   : (334)   procopy session end. 
+
+                Wed Aug 27 12:08:26 2025
+[2025/08/27@12:08:26.545-0500] P-23096      T-22024 I DBUTIL   : (451)   procopy get default SQL DBA session begin for cdcas on CON:. 
+[2025/08/27@12:08:26.546-0500] P-23096      T-22024 I DBUTIL   : (15321) Before Image Log Initialization at block 0  offset 0. 
+[2025/08/27@12:08:26.563-0500] P-23096      T-22024 I DBUTIL   : (14867) Procopy -newinstance Created a new database GUID. 
+[2025/08/27@12:08:26.568-0500] P-23096      T-22024 I DBUTIL   : (15109) At Database close the number of live transactions is 0. 
+[2025/08/27@12:08:26.568-0500] P-23096      T-22024 I DBUTIL   : (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/27@12:08:26.571-0500] P-23096      T-22024 I DBUTIL   : (334)   procopy get default SQL DBA session end. 
+
+                Wed Aug 27 12:08:29 2025
+[2025/08/27@12:08:29.294-0500] P-6332       T-22732 I ABL      : (451)   Single-user session begin for cdcas on CON:. 
+[2025/08/27@12:08:29.295-0500] P-6332       T-22732 I ABL      : (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/27@12:08:29.323-0500] P-6332       T-22732 I ABL      : (7129)  Usr 0 set name to cdcas. 
+[2025/08/27@12:08:31.964-0500] P-6332       T-22732 I ABL      : (15109) At Database close the number of live transactions is 0. 
+[2025/08/27@12:08:31.964-0500] P-6332       T-22732 I ABL      : (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/27@12:08:31.968-0500] P-6332       T-22732 I ABL      : (334)   Single-user session end. 
+
+                Wed Aug 27 12:19:23 2025
+[2025/08/27@12:19:23.865-0500] P-3420       T-18200 I BROKER  0: (333)   Multi-user session begin. 
+[2025/08/27@12:19:23.866-0500] P-3420       T-18200 I BROKER  0: (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/27@12:19:23.876-0500] P-3420       T-18200 I BROKER  0: (452)   Login by cdcas on batch. 
+[2025/08/27@12:19:23.877-0500] P-3420       T-18200 I BROKER  0: (4393)  This server is licensed for local logins only. 
+[2025/08/27@12:19:23.886-0500] P-3420       T-18200 I BROKER  0: (12036) The port 25000 is already in use. 
+[2025/08/27@12:19:23.886-0500] P-3420       T-18200 I BROKER  0: (15193) The normal shutdown of the database will continue for 10 Min 0 Sec if required. 
+[2025/08/27@12:19:23.886-0500] P-3420       T-18200 I BROKER  0: (2248)  Begin normal shutdown 
+[2025/08/27@12:19:24.901-0500] P-3420       T-18200 I BROKER  0: (2263)  Resending shutdown request to 0 user(s). 
+[2025/08/27@12:19:28.942-0500] P-3420       T-18200 I BROKER  0: (15109) At Database close the number of live transactions is 0. 
+[2025/08/27@12:19:28.942-0500] P-3420       T-18200 I BROKER  0: (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/27@12:19:28.942-0500] P-3420       T-18200 I BROKER  0: (453)   Logout by cdcas on batch. 
+[2025/08/27@12:19:28.954-0500] P-3420       T-18200 I BROKER   : (16869) Removed shared memory with segment_id: 2591731417088 
+[2025/08/27@12:19:28.954-0500] P-3420       T-18200 I BROKER   : (334)   Multi-user session end. 
