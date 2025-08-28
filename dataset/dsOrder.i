@@ -14,4 +14,4 @@
 
 {dataset/ttOrder.i}
 
-define dataset dsOrder reference-only for ttOrder.
+define dataset dsOrder for ttOrder.

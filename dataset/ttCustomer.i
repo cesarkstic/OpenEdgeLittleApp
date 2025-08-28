@@ -12,7 +12,7 @@
     Notes       :
   ----------------------------------------------------------------------*/
 
-define temp-table ttCustomer no-undo reference-only before-table ttCustomerBT
+define temp-table ttCustomer no-undo {&reference-only}
     field custNum as integer
     field name as character
     field address as character

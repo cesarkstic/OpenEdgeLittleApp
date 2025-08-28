@@ -12,6 +12,6 @@
     Notes       :
   ----------------------------------------------------------------------*/
 
-{dataset/ttCustomer.i}
+{dataset/ttCustomer.i &reference-only = {&reference-only}}
 
-define dataset dsCustomer reference-only for ttCustomer.
+define dataset dsCustomer {&reference-only} for ttCustomer.
