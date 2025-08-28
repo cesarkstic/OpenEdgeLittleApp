@@ -19,6 +19,8 @@ CLASS data.CustomerDA:
        
     method public void getCustomerInfo (input custNum as integer, dataset dsCustomer):
         
+        dataset dsCustomer:EMPTY-DATASET ().
+        
         for customer no-lock where
             Customer.CustNum = custNum:
                 

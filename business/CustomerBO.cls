@@ -30,7 +30,7 @@ CLASS business.CustomerBO:
     method public void getCustomerInfo (input custNum as integer, dataset dsCustomer): 
         
         if not oCustomer:can-findByCustomer(custNum) then
-            undo, throw new AppError(substitute ("Customer with ID &1 not found", custNum)).    
+            undo, throw new Exceptions.NotFoundExc(substitute ("Customer with ID &1 not found", custNum)).    
             
         oCustomer:getCustomerInfo(custNum, dataset dsCustomer by-reference). 
     end method.

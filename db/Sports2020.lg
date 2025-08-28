@@ -318,3 +318,108 @@
 [2025/08/28@09:33:16.702-0500] P-2256       T-22664 I BROKER  0: (453)   Logout by cdcas on batch. 
 [2025/08/28@09:33:16.722-0500] P-2256       T-22664 I BROKER   : (16869) Removed shared memory with segment_id: 1610394238976 
 [2025/08/28@09:33:16.722-0500] P-2256       T-22664 I BROKER   : (334)   Multi-user session end. 
+
+                Thu Aug 28 09:39:28 2025
+[2025/08/28@09:39:28.322-0500] P-10416      T-22112 I BROKER  0: (333)   Multi-user session begin. 
+[2025/08/28@09:39:28.323-0500] P-10416      T-22112 I BROKER  0: (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/28@09:39:28.328-0500] P-10416      T-22112 I BROKER  0: (452)   Login by cdcas on batch. 
+[2025/08/28@09:39:28.329-0500] P-10416      T-22112 I BROKER  0: (4393)  This server is licensed for local logins only. 
+[2025/08/28@09:39:28.337-0500] P-10416      T-22112 I BROKER  0: (12036) The port 25000 is already in use. 
+[2025/08/28@09:39:28.337-0500] P-10416      T-22112 I BROKER  0: (15193) The normal shutdown of the database will continue for 10 Min 0 Sec if required. 
+[2025/08/28@09:39:28.337-0500] P-10416      T-22112 I BROKER  0: (2248)  Begin normal shutdown 
+[2025/08/28@09:39:29.343-0500] P-10416      T-22112 I BROKER  0: (2263)  Resending shutdown request to 0 user(s). 
+[2025/08/28@09:39:33.388-0500] P-10416      T-22112 I BROKER  0: (15109) At Database close the number of live transactions is 0. 
+[2025/08/28@09:39:33.388-0500] P-10416      T-22112 I BROKER  0: (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/28@09:39:33.389-0500] P-10416      T-22112 I BROKER  0: (453)   Logout by cdcas on batch. 
+[2025/08/28@09:39:33.396-0500] P-10416      T-22112 I BROKER   : (16869) Removed shared memory with segment_id: 1644117229568 
+[2025/08/28@09:39:33.396-0500] P-10416      T-22112 I BROKER   : (334)   Multi-user session end. 
+
+                Thu Aug 28 09:41:23 2025
+[2025/08/28@09:41:23.437-0500] P-13556      T-17096 I BROKER  0: (333)   Multi-user session begin. 
+[2025/08/28@09:41:23.438-0500] P-13556      T-17096 I BROKER  0: (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/28@09:41:23.440-0500] P-13556      T-17096 I BROKER  0: (452)   Login by cdcas on batch. 
+[2025/08/28@09:41:23.441-0500] P-13556      T-17096 I BROKER  0: (4393)  This server is licensed for local logins only. 
+[2025/08/28@09:41:23.447-0500] P-13556      T-17096 I BROKER  0: (12036) The port 25000 is already in use. 
+[2025/08/28@09:41:23.447-0500] P-13556      T-17096 I BROKER  0: (15193) The normal shutdown of the database will continue for 10 Min 0 Sec if required. 
+[2025/08/28@09:41:23.447-0500] P-13556      T-17096 I BROKER  0: (2248)  Begin normal shutdown 
+[2025/08/28@09:41:24.460-0500] P-13556      T-17096 I BROKER  0: (2263)  Resending shutdown request to 0 user(s). 
+[2025/08/28@09:41:28.505-0500] P-13556      T-17096 I BROKER  0: (15109) At Database close the number of live transactions is 0. 
+[2025/08/28@09:41:28.505-0500] P-13556      T-17096 I BROKER  0: (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/28@09:41:28.506-0500] P-13556      T-17096 I BROKER  0: (453)   Logout by cdcas on batch. 
+[2025/08/28@09:41:28.514-0500] P-13556      T-17096 I BROKER   : (16869) Removed shared memory with segment_id: 1905642438656 
+[2025/08/28@09:41:28.514-0500] P-13556      T-17096 I BROKER   : (334)   Multi-user session end. 
+
+                Thu Aug 28 09:44:20 2025
+[2025/08/28@09:44:20.741-0500] P-10864      T-17588 I BROKER  0: (333)   Multi-user session begin. 
+[2025/08/28@09:44:20.742-0500] P-10864      T-17588 I BROKER  0: (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/28@09:44:20.745-0500] P-10864      T-17588 I BROKER  0: (452)   Login by cdcas on batch. 
+[2025/08/28@09:44:20.745-0500] P-10864      T-17588 I BROKER  0: (4393)  This server is licensed for local logins only. 
+[2025/08/28@09:44:20.753-0500] P-10864      T-17588 I BROKER  0: (12036) The port 25000 is already in use. 
+[2025/08/28@09:44:20.754-0500] P-10864      T-17588 I BROKER  0: (15193) The normal shutdown of the database will continue for 10 Min 0 Sec if required. 
+[2025/08/28@09:44:20.754-0500] P-10864      T-17588 I BROKER  0: (2248)  Begin normal shutdown 
+[2025/08/28@09:44:21.760-0500] P-10864      T-17588 I BROKER  0: (2263)  Resending shutdown request to 0 user(s). 
+[2025/08/28@09:44:25.816-0500] P-10864      T-17588 I BROKER  0: (15109) At Database close the number of live transactions is 0. 
+[2025/08/28@09:44:25.816-0500] P-10864      T-17588 I BROKER  0: (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/28@09:44:25.817-0500] P-10864      T-17588 I BROKER  0: (453)   Logout by cdcas on batch. 
+[2025/08/28@09:44:25.827-0500] P-10864      T-17588 I BROKER   : (16869) Removed shared memory with segment_id: 2189781696512 
+[2025/08/28@09:44:25.827-0500] P-10864      T-17588 I BROKER   : (334)   Multi-user session end. 
+
+                Thu Aug 28 09:44:43 2025
+[2025/08/28@09:44:43.348-0500] P-10036      T-23132 I BROKER  0: (333)   Multi-user session begin. 
+[2025/08/28@09:44:43.350-0500] P-10036      T-23132 I BROKER  0: (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/28@09:44:43.354-0500] P-10036      T-23132 I BROKER  0: (452)   Login by cdcas on batch. 
+[2025/08/28@09:44:43.355-0500] P-10036      T-23132 I BROKER  0: (4393)  This server is licensed for local logins only. 
+[2025/08/28@09:44:43.361-0500] P-10036      T-23132 I BROKER  0: (12036) The port 25000 is already in use. 
+[2025/08/28@09:44:43.361-0500] P-10036      T-23132 I BROKER  0: (15193) The normal shutdown of the database will continue for 10 Min 0 Sec if required. 
+[2025/08/28@09:44:43.361-0500] P-10036      T-23132 I BROKER  0: (2248)  Begin normal shutdown 
+[2025/08/28@09:44:44.366-0500] P-10036      T-23132 I BROKER  0: (2263)  Resending shutdown request to 0 user(s). 
+[2025/08/28@09:44:48.409-0500] P-10036      T-23132 I BROKER  0: (15109) At Database close the number of live transactions is 0. 
+[2025/08/28@09:44:48.409-0500] P-10036      T-23132 I BROKER  0: (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/28@09:44:48.410-0500] P-10036      T-23132 I BROKER  0: (453)   Logout by cdcas on batch. 
+[2025/08/28@09:44:48.418-0500] P-10036      T-23132 I BROKER   : (16869) Removed shared memory with segment_id: 2035511656448 
+[2025/08/28@09:44:48.418-0500] P-10036      T-23132 I BROKER   : (334)   Multi-user session end. 
+
+                Thu Aug 28 09:48:11 2025
+[2025/08/28@09:48:11.702-0500] P-4772       T-23212 I BROKER  0: (333)   Multi-user session begin. 
+[2025/08/28@09:48:11.703-0500] P-4772       T-23212 I BROKER  0: (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/28@09:48:11.706-0500] P-4772       T-23212 I BROKER  0: (452)   Login by cdcas on batch. 
+[2025/08/28@09:48:11.706-0500] P-4772       T-23212 I BROKER  0: (4393)  This server is licensed for local logins only. 
+[2025/08/28@09:48:11.715-0500] P-4772       T-23212 I BROKER  0: (12036) The port 25000 is already in use. 
+[2025/08/28@09:48:11.715-0500] P-4772       T-23212 I BROKER  0: (15193) The normal shutdown of the database will continue for 10 Min 0 Sec if required. 
+[2025/08/28@09:48:11.715-0500] P-4772       T-23212 I BROKER  0: (2248)  Begin normal shutdown 
+[2025/08/28@09:48:12.720-0500] P-4772       T-23212 I BROKER  0: (2263)  Resending shutdown request to 0 user(s). 
+[2025/08/28@09:48:16.757-0500] P-4772       T-23212 I BROKER  0: (15109) At Database close the number of live transactions is 0. 
+[2025/08/28@09:48:16.757-0500] P-4772       T-23212 I BROKER  0: (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/28@09:48:16.758-0500] P-4772       T-23212 I BROKER  0: (453)   Logout by cdcas on batch. 
+[2025/08/28@09:48:16.779-0500] P-4772       T-23212 I BROKER   : (16869) Removed shared memory with segment_id: 3178438459392 
+[2025/08/28@09:48:16.779-0500] P-4772       T-23212 I BROKER   : (334)   Multi-user session end. 
+
+                Thu Aug 28 09:50:02 2025
+[2025/08/28@09:50:02.395-0500] P-5148       T-22372 I BROKER  0: (333)   Multi-user session begin. 
+[2025/08/28@09:50:02.396-0500] P-5148       T-22372 I BROKER  0: (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/28@09:50:02.400-0500] P-5148       T-22372 I BROKER  0: (452)   Login by cdcas on batch. 
+[2025/08/28@09:50:02.401-0500] P-5148       T-22372 I BROKER  0: (4393)  This server is licensed for local logins only. 
+[2025/08/28@09:50:02.408-0500] P-5148       T-22372 I BROKER  0: (12036) The port 25000 is already in use. 
+[2025/08/28@09:50:02.408-0500] P-5148       T-22372 I BROKER  0: (15193) The normal shutdown of the database will continue for 10 Min 0 Sec if required. 
+[2025/08/28@09:50:02.408-0500] P-5148       T-22372 I BROKER  0: (2248)  Begin normal shutdown 
+[2025/08/28@09:50:03.412-0500] P-5148       T-22372 I BROKER  0: (2263)  Resending shutdown request to 0 user(s). 
+[2025/08/28@09:50:07.440-0500] P-5148       T-22372 I BROKER  0: (15109) At Database close the number of live transactions is 0. 
+[2025/08/28@09:50:07.440-0500] P-5148       T-22372 I BROKER  0: (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/28@09:50:07.441-0500] P-5148       T-22372 I BROKER  0: (453)   Logout by cdcas on batch. 
+[2025/08/28@09:50:07.449-0500] P-5148       T-22372 I BROKER   : (16869) Removed shared memory with segment_id: 2138339213312 
+[2025/08/28@09:50:07.450-0500] P-5148       T-22372 I BROKER   : (334)   Multi-user session end. 
+
+                Thu Aug 28 09:50:35 2025
+[2025/08/28@09:50:35.625-0500] P-3904       T-19428 I BROKER  0: (333)   Multi-user session begin. 
+[2025/08/28@09:50:35.626-0500] P-3904       T-19428 I BROKER  0: (15321) Before Image Log Initialization at block 0  offset 2643. 
+[2025/08/28@09:50:35.631-0500] P-3904       T-19428 I BROKER  0: (452)   Login by cdcas on batch. 
+[2025/08/28@09:50:35.632-0500] P-3904       T-19428 I BROKER  0: (4393)  This server is licensed for local logins only. 
+[2025/08/28@09:50:35.641-0500] P-3904       T-19428 I BROKER  0: (12036) The port 25000 is already in use. 
+[2025/08/28@09:50:35.641-0500] P-3904       T-19428 I BROKER  0: (15193) The normal shutdown of the database will continue for 10 Min 0 Sec if required. 
+[2025/08/28@09:50:35.641-0500] P-3904       T-19428 I BROKER  0: (2248)  Begin normal shutdown 
+[2025/08/28@09:50:36.655-0500] P-3904       T-19428 I BROKER  0: (2263)  Resending shutdown request to 0 user(s). 
+[2025/08/28@09:50:40.689-0500] P-3904       T-19428 I BROKER  0: (15109) At Database close the number of live transactions is 0. 
+[2025/08/28@09:50:40.689-0500] P-3904       T-19428 I BROKER  0: (15743) Before Image Log Completion at Block 0 Offset 2643. 
+[2025/08/28@09:50:40.689-0500] P-3904       T-19428 I BROKER  0: (453)   Logout by cdcas on batch. 
+[2025/08/28@09:50:40.698-0500] P-3904       T-19428 I BROKER   : (16869) Removed shared memory with segment_id: 2165888581632 
+[2025/08/28@09:50:40.698-0500] P-3904       T-19428 I BROKER   : (334)   Multi-user session end. 
