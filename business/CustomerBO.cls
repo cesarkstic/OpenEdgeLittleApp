@@ -17,7 +17,7 @@ CLASS business.CustomerBO:
 
     {dataset/dsCustomer.i &reference-only = {&reference-only}}
     
-    define property oCustomer as data.CustomerDa no-undo get. set.
+    define property oCustomer as data.CustomerDA no-undo get. set.
     
     constructor CustomerBO ():
         oCustomer = new data.CustomerDA ().
