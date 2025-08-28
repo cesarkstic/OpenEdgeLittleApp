@@ -12,6 +12,6 @@
     Notes       :
   ----------------------------------------------------------------------*/
 
-{dataset/ttOrder.i}
+{dataset/ttOrder.i &reference-only = {&reference-only}}
 
 define dataset dsOrder for ttOrder.

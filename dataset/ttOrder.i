@@ -12,11 +12,11 @@
     Notes       :
   ----------------------------------------------------------------------*/
 
-define temp-table ttOrder no-undo reference-only before-table ttOrderBT
-    field orderNumber as integer
+define temp-table ttOrder no-undo {&reference-only}
+    field orderNum as integer
     field custNum as integer
     field orderDate as date
     field shipDate as date
     field promiseDate as date
-    index iOrder is primary unique orderNumber custNum.
+    index iOrder is primary unique orderNum custNum.
 

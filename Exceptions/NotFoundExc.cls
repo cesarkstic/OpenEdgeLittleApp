@@ -13,7 +13,7 @@ USING Progress.Lang.*.
 
 BLOCK-LEVEL ON ERROR UNDO, THROW.
 
-CLASS Exceptions.NotFoundExc INHERITS Progress.Lang.AppError:
+CLASS exceptions.NotFoundExc INHERITS Progress.Lang.AppError:
     
     constructor NotFoundExc (input excMessage as character):
         super (excMessage, 1).
