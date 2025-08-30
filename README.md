@@ -4,7 +4,9 @@ Small App using Sports 2020 DB
 Dir Structure
 
 OpenEdgeLittleApp/
+
 ├── src/              # Standalone test programs for Customer, Order and OrderLine tables
+
 │   ├── exceptions/   # User defined exeptions
 │   ├── business/     # Business Objects layer
 │   ├── data/         # Data Access layer
