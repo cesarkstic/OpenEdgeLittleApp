@@ -23,13 +23,13 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CONNECT -db VALUE("db/sports2020.db") -1 NO-ERROR.
 
-{dataset/dsOrderLine.i &reference-only = {&reference-only}}
+{datasets/dsOrderLine.i &reference-only = {&reference-only}}
 
 define variable oOrderLine as business.OrderLineBO no-undo.
 
 oOrderLine = new business.OrderLineBO ().
 
-oOrderLine:getOrderLineInfo (10000, dataset dsOrderLine by-reference).
+oOrderLine:ListByOrderNum (10000, dataset dsOrderLine by-reference).
 
 for each ttOrderLine:
     disp ttOrderLine.
@@ -37,7 +37,7 @@ end.
 
 display oOrderLine:getOrderTotal (10000, dataset dsOrderLine by-reference) label 'Order Total'.
 
-oOrderLine:getOrderLineInfo (1, dataset dsOrderLine by-reference).
+oOrderLine:ListByOrderNum (1, dataset dsOrderLine by-reference).
 
 CATCH e AS Exceptions.NotFoundExc :
    message e:GetMessage(1).     

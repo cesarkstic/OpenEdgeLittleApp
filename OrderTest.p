@@ -23,19 +23,19 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CONNECT -db VALUE("db/sports2020.db") -1 NO-ERROR.
 
-{dataset/dsOrder.i &reference-only = {&reference-only}}
+{datasets/dsOrder.i &reference-only = {&reference-only}}
 
 define variable oOrder as business.OrderBO no-undo.
 
 oOrder = new business.OrderBO ().
 
-oOrder:getOrderInfo(10000, dataset dsOrder by-reference).
+oOrder:GetByOrderNum (10000, dataset dsOrder by-reference).
 
 for each ttOrder:
     disp ttOrder with 1 column.
 end.
 
-oOrder:getOrderInfo (1, dataset dsOrder by-reference).
+oOrder:GetByOrderNum (1, dataset dsOrder by-reference).
 
 CATCH e AS Exceptions.NotFoundExc :
    message e:GetMessage(1).     

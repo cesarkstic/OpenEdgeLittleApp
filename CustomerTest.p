@@ -21,21 +21,21 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 /* ***************************  Main Block  *************************** */
 
-CONNECT -db VALUE("db/sports2020.db") -1 NO-ERROR.
+CONNECT -db VALUE("db/sports2020.db") -1 no-error.
 
-{dataset/dsCustomer.i &reference-only = {&reference-only}}
+{datasets/dsCustomer.i &reference-only = {&reference-only}}
 
 define variable oCustomer as business.CustomerBO no-undo.
 
 oCustomer = new business.CustomerBO ().
 
-oCustomer:getCustomerInfo (3225, dataset dsCustomer by-reference).
+oCustomer:GetByCustNum (3225, dataset dsCustomer by-reference).
 
 for each ttCustomer:
     disp ttCustomer with 1 column.
 end.
 
-oCustomer:getCustomerInfo (1, dataset dsCustomer by-reference).
+oCustomer:GetByCustNum (1, dataset dsCustomer by-reference).
 
 CATCH e AS Exceptions.NotFoundExc :
    message e:GetMessage(1).     

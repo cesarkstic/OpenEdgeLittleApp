@@ -1,17 +1,17 @@
 
 /*------------------------------------------------------------------------
-    File        : dsCustomer.i
+    File        : dsOrderLine
     Purpose     : 
 
     Syntax      :
 
-    Description : Customer table DS
+    Description : Dataset for OrderLine
 
     Author(s)   : cdcas
-    Created     : Wed Aug 27 12:36:58 CDT 2025
+    Created     : Thu Aug 28 10:40:16 CDT 2025
     Notes       :
   ----------------------------------------------------------------------*/
 
-{dataset/ttCustomer.i &reference-only = {&reference-only}}
+{datasets/ttOrderLine.i &reference-only = {&reference-only}}
 
-define dataset dsCustomer {&reference-only} for ttCustomer.
+define dataset dsOrderLine for ttOrderLine.

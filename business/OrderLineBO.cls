@@ -15,7 +15,7 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS business.OrderLineBO: 
 
-    {dataset/dsOrderLine.i &reference-only = {&reference-only}}
+    {datasets/dsOrderLine.i &reference-only = {&reference-only}}
     
     define property oOrderLine as data.OrderLineDA no-undo get. set.
     
@@ -27,12 +27,12 @@ CLASS business.OrderLineBO:
         delete object oOrderLine.
     end destructor.
         
-    method public void getOrderLineInfo (input orderNum as integer, dataset dsOrderLine): 
+    method public void ListByOrderNum (input orderNum as integer, dataset dsOrderLine): 
         
-        if not oOrderLine:can-findByOrder(OrderNum) then
+        if not oOrderLine:TryListByOrderNum (OrderNum) then
             undo, throw new exceptions.NotFoundExc(substitute ("Order Line with ID &1 not found", OrderNum)).    
             
-        oOrderLine:getOrderLinesInfo (OrderNum, dataset dsOrderLine by-reference). 
+        oOrderLine:ListByOrderNum (OrderNum, dataset dsOrderLine by-reference). 
     end method.
     
     method public decimal getOrderTotal (input orderNum as integer, dataset dsOrderLine):

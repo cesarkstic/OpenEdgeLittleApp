@@ -15,7 +15,7 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS business.CustomerBO: 
 
-    {dataset/dsCustomer.i &reference-only = {&reference-only}}
+    {datasets/dsCustomer.i &reference-only = {&reference-only}}
     
     define property oCustomer as data.CustomerDA no-undo get. set.
     
@@ -27,12 +27,12 @@ CLASS business.CustomerBO:
         delete object oCustomer.
     end destructor.
         
-    method public void getCustomerInfo (input custNum as integer, dataset dsCustomer): 
+    method public void GetByCustNum (input custNum as integer, dataset dsCustomer): 
         
-        if not oCustomer:can-findByCustomer(custNum) then
+        if not oCustomer:TryGetByCustNum (custNum) then
             undo, throw new exceptions.NotFoundExc(substitute ("Customer with ID &1 not found", custNum)).    
             
-        oCustomer:getCustomerInfo(custNum, dataset dsCustomer by-reference). 
+        oCustomer:GetByCustNum (custNum, dataset dsCustomer by-reference). 
     end method.
 
 END CLASS.

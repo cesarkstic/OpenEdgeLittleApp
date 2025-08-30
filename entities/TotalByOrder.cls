@@ -15,9 +15,9 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS entities.TotalByOrder: 
     
-    {dataset/dsCustomer.i &reference-only = {&reference-only}}
-    {dataset/dsOrder.i &reference-only = {&reference-only}}
-    {dataset/dsOrderLine.i &reference-only = {&reference-only}}
+    {datasets/dsCustomer.i &reference-only = {&reference-only}}
+    {datasets/dsOrder.i &reference-only = {&reference-only}}
+    {datasets/dsOrderLine.i &reference-only = {&reference-only}}
     
     define public property custNum as integer no-undo get. set.
     define public property custName as character no-undo get. set.
@@ -47,9 +47,9 @@ CLASS entities.TotalByOrder:
   
     method public void getTotalByOrder ():
         
-        oCustomer:getCustomerInfo (custNum, dataset dsCustomer by-reference).
-        oOrder:getOrderInfo (orderNum, dataset dsOrder by-reference).
-        oOrderLine:getOrderLineInfo (orderNum, dataset dsOrderLine by-reference).        
+        oCustomer:GetByCustNum (custNum, dataset dsCustomer by-reference).
+        oOrder:GetByOrderNum (orderNum, dataset dsOrder by-reference).
+        oOrderLine:ListByOrderNum (orderNum, dataset dsOrderLine by-reference).        
         
         for first ttCustomer:    
             custName = ttCustomer.name.

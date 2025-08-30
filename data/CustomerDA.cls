@@ -15,9 +15,9 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS data.CustomerDA: 
     
-   {dataset/dsCustomer.i}
+   {datasets/dsCustomer.i}
        
-    method public void getCustomerInfo (input custNum as integer, dataset dsCustomer):
+    method public void GetByCustNum (input custNum as integer, dataset dsCustomer):
         
         dataset dsCustomer:EMPTY-DATASET ().
         
@@ -36,7 +36,7 @@ CLASS data.CustomerDA:
     end method.
     
     
-    method public logical can-findByCustomer (input custNum as integer):
+    method public logical TryGetByCustNum (input custNum as integer):
         
         return
             can-find (customer where Customer.CustNum = custNum).

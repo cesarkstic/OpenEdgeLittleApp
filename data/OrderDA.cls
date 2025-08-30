@@ -15,9 +15,9 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS data.OrderDA:
     
-    {dataset/dsOrder.i}
+    {datasets/dsOrder.i}
     
-    method public void getOrderInfo (input orderNum as integer, dataset dsOrder):
+    method public void GetByOrderNum (input orderNum as integer, dataset dsOrder):
         
         dataset dsOrder:EMPTY-DATASET ().
         
@@ -35,7 +35,7 @@ CLASS data.OrderDA:
         end.
     end method.
     
-    method public logical can-findByOrder (input orderNum as integer):
+    method public logical TryGetByOrderNum (input orderNum as integer):
         
         return
             can-find (order where Order.OrderNum = orderNum).
