@@ -16,10 +16,10 @@ It follows a structured approach, with layers for business logic, data access, a
 ```
 ├── business/        Layer hosting business logic and validation
 ├── data/            Data access and queries
-├── dataset/         Schema or temp-table definitions
+├── datasets/        Schema or temp-table definitions
 ├── db/              Database connection utilities
 ├── entities/        Business entity definitions
-├── Exceptions/      Custom exception handlers
+├── exceptions/      Custom exception handlers
 ├── .dbconnection    Configuration for DB connectivity
 ├── build.config     Build instructions
 ├── *.p Test Files   CustomerTest.p, OrderTest.p, OrderLineTest.p, TotalByOrderTest.p
