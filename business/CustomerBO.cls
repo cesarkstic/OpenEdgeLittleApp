@@ -15,7 +15,7 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS business.CustomerBO: 
 
-    {datasets/dsCustomer.i &reference-only = {&reference-only}}
+    {datasets/dsCustomer.i}
     
     define property oCustomer as data.CustomerDA no-undo get. set.
     

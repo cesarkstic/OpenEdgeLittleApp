@@ -12,7 +12,7 @@
     Notes       :
   ----------------------------------------------------------------------*/
 
-define temp-table ttOrder no-undo {&reference-only}
+define temp-table ttOrder no-undo
     field orderNum as integer
     field custNum as integer
     field orderDate as date

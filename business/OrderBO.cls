@@ -15,7 +15,7 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS business.OrderBO: 
 
-    {datasets/dsOrder.i &reference-only = {&reference-only}}
+    {datasets/dsOrder.i}
     
     define property oOrder as data.OrderDA no-undo get. set.
     

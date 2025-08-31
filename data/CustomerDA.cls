@@ -17,7 +17,7 @@ CLASS data.CustomerDA:
     
    {datasets/dsCustomer.i}
        
-    method public void GetByCustNum (input custNum as integer, dataset dsCustomer):
+    method public void GetByCustNum (input custNum as integer,  dataset dsCustomer):
         
         dataset dsCustomer:EMPTY-DATASET ().
         

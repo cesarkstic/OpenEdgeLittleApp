@@ -12,7 +12,7 @@
     Notes       :
   ----------------------------------------------------------------------*/
 
-define temp-table ttOrderLine no-undo {&reference-only}
+define temp-table ttOrderLine no-undo
     field orderNum as integer
     field lineNum as integer
     field itemNum as integer

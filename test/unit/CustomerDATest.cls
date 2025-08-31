@@ -17,7 +17,7 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS test.unit.CustomerDATest INHERITS data.CustomerDA:
     
-    {datasets/dsCustomer.i &reference-only = {&reference-only}}
+    {datasets/dsCustomer.i}
 
     @Test.
     method public void testGetByCustNum():

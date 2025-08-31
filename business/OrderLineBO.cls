@@ -15,7 +15,7 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS business.OrderLineBO: 
 
-    {datasets/dsOrderLine.i &reference-only = {&reference-only}}
+    {datasets/dsOrderLine.i}
     
     define property oOrderLine as data.OrderLineDA no-undo get. set.
     

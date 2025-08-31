@@ -15,9 +15,9 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CLASS entities.TotalByOrder: 
     
-    {datasets/dsCustomer.i &reference-only = {&reference-only}}
-    {datasets/dsOrder.i &reference-only = {&reference-only}}
-    {datasets/dsOrderLine.i &reference-only = {&reference-only}}
+    {datasets/dsCustomer.i}
+    {datasets/dsOrder.i}
+    {datasets/dsOrderLine.i}
     
     define public property custNum as integer no-undo get. set.
     define public property custName as character no-undo get. set.

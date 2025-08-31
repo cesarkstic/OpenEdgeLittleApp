@@ -23,7 +23,7 @@ BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 CONNECT -db VALUE("db/sports2020.db") -1 NO-ERROR.
 
-{datasets/dsOrder.i &reference-only = {&reference-only}}
+{datasets/dsOrder.i}
 
 define variable oOrder as business.OrderBO no-undo.
 
