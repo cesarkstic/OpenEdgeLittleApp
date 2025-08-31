@@ -1890,3 +1890,33 @@
 [2025/08/31@15:09:09.479-0500] P-1036       T-7560  I SRV     1: (17961) User 9 set tty to LAPTOP-DJBHA2A4. 
 [2025/08/31@15:09:09.488-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
 [2025/08/31@15:09:13.544-0500] P-1036       T-7560  I SRV     1: (739)   Logout usernum 9, userid cdcas, on LAPTOP-DJBHA2A4. 
+[2025/08/31@15:16:10.062-0500] P-1036       T-7560  I SRV     1: (742)   Login usernum 9, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/08/31@15:16:10.062-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:16:10.062-0500] P-1036       T-7560  I SRV     1: (17961) User 9 set tty to LAPTOP-DJBHA2A4. 
+[2025/08/31@15:16:10.073-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:16:13.109-0500] P-1036       T-7560  I SRV     1: (739)   Logout usernum 9, userid cdcas, on LAPTOP-DJBHA2A4. 
+[2025/08/31@15:16:51.379-0500] P-1036       T-7560  I SRV     1: (742)   Login usernum 9, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/08/31@15:16:51.379-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:16:51.379-0500] P-1036       T-7560  I SRV     1: (17961) User 9 set tty to LAPTOP-DJBHA2A4. 
+[2025/08/31@15:16:51.387-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:16:56.437-0500] P-1036       T-7560  I SRV     1: (739)   Logout usernum 9, userid cdcas, on LAPTOP-DJBHA2A4. 
+[2025/08/31@15:17:32.935-0500] P-1036       T-7560  I SRV     1: (742)   Login usernum 9, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/08/31@15:17:32.935-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:17:32.935-0500] P-1036       T-7560  I SRV     1: (17961) User 9 set tty to LAPTOP-DJBHA2A4. 
+[2025/08/31@15:17:32.946-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:17:35.999-0500] P-1036       T-7560  I SRV     1: (739)   Logout usernum 9, userid cdcas, on LAPTOP-DJBHA2A4. 
+[2025/08/31@15:18:24.525-0500] P-1036       T-7560  I SRV     1: (742)   Login usernum 9, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/08/31@15:18:24.525-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:18:24.525-0500] P-1036       T-7560  I SRV     1: (17961) User 9 set tty to LAPTOP-DJBHA2A4. 
+[2025/08/31@15:18:24.536-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:18:26.570-0500] P-1036       T-7560  I SRV     1: (739)   Logout usernum 9, userid cdcas, on LAPTOP-DJBHA2A4. 
+[2025/08/31@15:18:51.907-0500] P-1036       T-7560  I SRV     1: (742)   Login usernum 9, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/08/31@15:18:51.907-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:18:51.907-0500] P-1036       T-7560  I SRV     1: (17961) User 9 set tty to LAPTOP-DJBHA2A4. 
+[2025/08/31@15:18:51.915-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:18:52.956-0500] P-1036       T-7560  I SRV     1: (739)   Logout usernum 9, userid cdcas, on LAPTOP-DJBHA2A4. 
+[2025/08/31@15:20:13.828-0500] P-1036       T-7560  I SRV     1: (742)   Login usernum 9, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/08/31@15:20:13.828-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:20:13.828-0500] P-1036       T-7560  I SRV     1: (17961) User 9 set tty to LAPTOP-DJBHA2A4. 
+[2025/08/31@15:20:13.839-0500] P-1036       T-7560  I SRV     1: (7129)  Usr 9 set name to cdcas. 
+[2025/08/31@15:20:14.881-0500] P-1036       T-7560  I SRV     1: (739)   Logout usernum 9, userid cdcas, on LAPTOP-DJBHA2A4. 
