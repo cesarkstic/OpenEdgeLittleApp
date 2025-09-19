@@ -2130,3 +2130,21 @@
 [2025/08/31@20:19:49.436-0500] P-6812       T-4500  I SQLSRV2 3: (7129)  Usr 4 set name to cdcas. 
 [2025/08/31@20:19:49.436-0500] P-6812       T-4500  I SQLSRV2 3: (19205) SQLLockWaitTimeout 5 
 [2025/08/31@20:19:49.450-0500] P-6812       T-4500  I SQLSRV2 3: (19198) Login by user 4. Using TCP/IP IPV4 address 127.0.0.1
+[2025/08/31@20:20:04.061-0500] P-18340      T-18332 I SRV     5: (452)   Login by cdcas on CON:. 
+[2025/08/31@20:20:04.077-0500] P-18340      T-18332 I SRV     5: (19552) Server with server num 3 logged in. 
+[2025/08/31@20:20:04.077-0500] P-18340      T-18332 I SRV     5: (5646)  Started on port 3002 using TCP IPV4 address 127.0.0.1, pid 18340. 
+[2025/08/31@20:20:05.027-0500] P-18340      T-18332 I SRV     5: (742)   Login usernum 6, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/08/31@20:20:05.027-0500] P-18340      T-18332 I SRV     5: (7129)  Usr 6 set name to cdcas. 
+[2025/08/31@20:20:05.027-0500] P-18340      T-18332 I SRV     5: (17961) User 6 set tty to LAPTOP-DJBHA2A4. 
+[2025/08/31@20:20:05.037-0500] P-18340      T-18332 I SRV     5: (7129)  Usr 6 set name to cdcas. 
+[2025/08/31@20:20:12.087-0500] P-18340      T-18332 I SRV     5: (739)   Logout usernum 6, userid cdcas, on LAPTOP-DJBHA2A4. 
+[2025/08/31@20:22:43.668-0500] P-18340      T-18332 I SRV     5: (742)   Login usernum 6, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/08/31@20:22:43.669-0500] P-18340      T-18332 I SRV     5: (7129)  Usr 6 set name to cdcas. 
+[2025/08/31@20:22:43.669-0500] P-18340      T-18332 I SRV     5: (17961) User 6 set tty to LAPTOP-DJBHA2A4. 
+[2025/08/31@20:22:43.676-0500] P-18340      T-18332 I SRV     5: (7129)  Usr 6 set name to cdcas. 
+[2025/08/31@20:22:51.776-0500] P-18340      T-18332 I SRV     5: (739)   Logout usernum 6, userid cdcas, on LAPTOP-DJBHA2A4. 
+
+                Mon Sep  1 11:24:41 2025
+[2025/09/01@11:24:41.739-0500] P-16500      T-6780  I SRV     1: (739)   Logout usernum 2, userid cdcas, on LAPTOP-DJBHA2A4. 
+[2025/09/01@11:24:41.926-0500] P-6812       T-4500  I SQLSRV2 3: (19201) Logout by user 4.
+[2025/09/01@11:24:41.930-0500] P-6812       T-4500  I SQLSRV2 3: (453)   Logout by cdcas on kubernetes:50206. 
