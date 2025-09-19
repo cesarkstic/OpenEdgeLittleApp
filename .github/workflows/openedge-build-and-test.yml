@@ -88,10 +88,11 @@ jobs:
           # PowerShell policy can block scripts; use -p with _progres directly
           # We pass build script 'compile.p' to _progres in batch mode
           PROPATH: ${{ env.PROPATH }}
-        run: |
-          # "%DLC%\bin\_progres.exe" -b -p compile.p -pf "%DLC%\bin\startup.pf" -q
+        run: |          
           "%DLC%\bin\_progres.exe" -b -p compile.p -q
           if errorlevel 1 exit /b 1
+
+        # "%DLC%\bin\_progres.exe" -b -p compile.p -pf "%DLC%\bin\startup.pf" -q
 
       # ------------------------------------------------------------------
       # Create a super-lightweight test harness and (if needed) a sample test
