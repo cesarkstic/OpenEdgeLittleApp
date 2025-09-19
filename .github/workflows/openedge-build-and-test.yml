@@ -1,0 +1,182 @@
+name: OpenEdge Build & Test (Self-Hosted)
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: self-hosted
+
+    env:
+      # 🔧 Adjust this to your local OpenEdge install path
+      DLC: C:\Progress\OpenEdge
+      # Add src to PROPATH so COMPILE and RUN can locate code
+      PROPATH: ${{ github.workspace }}\src;${{ github.workspace }}\test\unit;${{ github.workspace }};.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify OpenEdge tools exist
+        shell: cmd
+        run: |
+          if not exist "%DLC%\bin\_progres.exe" (
+            echo _progres.exe not found at %DLC%\bin
+            exit /b 1
+          )
+          echo Found %DLC%\bin\_progres.exe
+
+      - name: Prepare build folders
+        shell: cmd
+        run: |
+          if not exist rcode mkdir rcode
+          if not exist test-results mkdir test-results
+
+      # ------------------------------------------------------------------
+      # Create a tiny ABL compile script on the fly (compile.p)
+      # It compiles everything under src\ and tests\ to rcode\ (if present)
+      # ------------------------------------------------------------------
+      - name: Create compile.p
+        shell: powershell
+        run: |
+          @'
+          /* compile.p : compile .p and .cls under src\ and tests\ into rcode\ */
+          USING Progress.Lang.*.
+
+          DEFINE VARIABLE outDir AS CHARACTER NO-UNDO.
+          outDir = REPLACE( OS-GETENV("GITHUB_WORKSPACE"), "~\", "/" ) + "/rcode".
+          OS-CREATE-DIR outDir NO-ERROR.
+
+          /* Ensure PROPATH contains src and repo root */
+          IF INDEX(SESSION:PROPATH, "src") = 0 THEN
+            SESSION:PROPATH = OS-GETENV("PROPATH").
+
+          /* helper: compile all files in a directory (non-recursive) */
+          PROCEDURE CompileDir:
+            DEFINE INPUT PARAMETER pcDir AS CHARACTER NO-UNDO.
+            DEFINE VARIABLE cFile AS CHARACTER NO-UNDO.
+
+            /* list files in pcDir */
+            INPUT FROM OS-DIR(pcDir).
+            REPEAT:
+              IMPORT cFile.
+              IF cFile MATCHES "*.p" OR cFile MATCHES "*.cls" THEN DO:
+                MESSAGE "Compiling:" pcDir + "/" + cFile VIEW-AS ALERT-BOX INFO BUTTONS OK.
+                COMPILE VALUE(pcDir + "/" + cFile)
+                  SAVE INTO outDir
+                  NO-ERROR.
+                IF COMPILER:ERROR THEN DO:
+                  MESSAGE "Compile error in" pcDir + "/" + cFile VIEW-AS ALERT-BOX ERROR BUTTONS OK.
+                  QUIT ERROR.
+                END.
+              END.
+            END.
+            INPUT CLOSE.
+          END PROCEDURE.
+
+          /* compile src and tests if present */
+          IF SEARCH("src") <> ? THEN RUN CompileDir("src").
+          IF SEARCH("tests") <> ? THEN RUN CompileDir("tests").
+
+          QUIT.
+          '@ > compile.p
+
+      - name: Compile ABL to r-code
+        shell: cmd
+        env:
+          # PowerShell policy can block scripts; use -p with _progres directly
+          # We pass build script 'compile.p' to _progres in batch mode
+          PROPATH: ${{ env.PROPATH }}
+        run: |
+          "%DLC%\bin\_progres.exe" -b -p compile.p -pf "%DLC%\bin\startup.pf" -q
+          if errorlevel 1 exit /b 1
+
+      # ------------------------------------------------------------------
+      # Create a super-lightweight test harness and (if needed) a sample test
+      # You can delete the sample when you add real tests under tests\.
+      # Convention: any .p in tests\ that RUNs and returns ERROR causes failure
+      # ------------------------------------------------------------------
+      - name: Create test harness (test-runner.p)
+        shell: powershell
+        run: |
+          @'
+          /* test-runner.p : runs every .p under tests\ and fails on error.
+             Write each test to QUIT ERROR on failure or RETURN ERROR to signal failure */
+          USING Progress.Lang.*.
+
+          DEFINE VARIABLE testDir   AS CHARACTER NO-UNDO INITIAL "tests".
+          DEFINE VARIABLE results   AS CHARACTER NO-UNDO INITIAL "test-results".
+          DEFINE VARIABLE total     AS INTEGER   NO-UNDO.
+          DEFINE VARIABLE failed    AS INTEGER   NO-UNDO.
+          DEFINE VARIABLE cFile     AS CHARACTER NO-UNDO.
+
+          OS-CREATE-DIR results NO-ERROR.
+
+          IF SEARCH(testDir) = ? THEN DO:
+            MESSAGE "No tests directory found. Skipping tests." VIEW-AS ALERT-BOX INFO BUTTONS OK.
+            QUIT. /* No failure if no tests present */
+          END.
+
+          INPUT FROM OS-DIR(testDir).
+          REPEAT:
+            IMPORT cFile.
+            IF cFile MATCHES "*.p" THEN DO:
+              total = total + 1.
+              MESSAGE SUBSTITUTE("Running test: &1/&2", testDir, cFile) VIEW-AS ALERT-BOX INFO BUTTONS OK.
+              RUN VALUE(testDir + "/" + cFile) NO-ERROR.
+              IF ERROR-STATUS:ERROR THEN DO:
+                failed = failed + 1.
+                MESSAGE SUBSTITUTE("FAILED: &1", cFile) VIEW-AS ALERT-BOX ERROR BUTTONS OK.
+              END.
+            END.
+          END.
+          INPUT CLOSE.
+
+          /* Write a tiny summary file */
+          OUTPUT TO VALUE(results + "/summary.txt").
+          PUT UNFORMATTED SUBSTITUTE("Total: &1  Failed: &2~n", total, failed).
+          OUTPUT CLOSE.
+
+          IF failed > 0 THEN QUIT ERROR.
+          QUIT.
+          '@ > test-runner.p
+
+      - name: (Optional) Create a sample test if none exist
+        shell: powershell
+        run: |
+          if (-not (Test-Path "tests")) { New-Item -ItemType Directory -Path "tests" | Out-Null }
+          # Only create sample if directory is empty
+          if ((Get-ChildItem -Path "tests" -Filter *.p -File | Measure-Object).Count -eq 0) {
+            @'
+            /* tests/sample_test.p : example test */
+            DEFINE VARIABLE expected AS INTEGER NO-UNDO INITIAL 4.
+            DEFINE VARIABLE actual   AS INTEGER NO-UNDO.
+            ASSIGN actual = 2 + 2.
+            IF actual <> expected THEN DO:
+              MESSAGE "2+2 should equal 4" VIEW-AS ALERT-BOX ERROR BUTTONS OK.
+              QUIT ERROR.
+            END.
+            RETURN.
+            '@ > tests\sample_test.p
+          }
+
+      - name: Run tests
+        shell: cmd
+        env:
+          PROPATH: ${{ env.PROPATH }}
+        run: |
+          "%DLC%\bin\_progres.exe" -b -p test-runner.p -pf "%DLC%\bin\startup.pf" -q
+          if errorlevel 1 exit /b 1
+
+      - name: Upload r-code
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcode
+          path: rcode
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results
