@@ -9,8 +9,7 @@ jobs:
     runs-on: self-hosted
 
     env:
-      DLC: "C:\\Progress\\OpenEdge"   # <-- quote Windows paths
-      PROPATH: "${{ github.workspace }}\\src;${{ github.workspace }}\\tests;${{ github.workspace }};."
+      DLC: "C:\\Progress\\OpenEdge"   # 🔧 adjust if different on your machine
 
     steps:
       - name: Checkout
@@ -25,40 +24,38 @@ jobs:
           )
           echo Found %DLC%\bin\_progres.exe
 
-      - name: Prepare build folders
+      - name: Prepare folders
         shell: cmd
         run: |
           if not exist rcode mkdir rcode
           if not exist test-results mkdir test-results
 
-      # Create compile.p in ASCII (NO BOM)
+      # --- Parameter file for PROPATH ---
+      - name: Create openedge.pf
+        shell: powershell
+        run: |
+          Set-Content -Path openedge.pf -Value '-propath src;tests;.' -Encoding ASCII
+
+      # --- compile.p ---
       - name: Create compile.p (ASCII)
         shell: powershell
         run: |
           $code = @'
           /* compile.p : compile .p and .cls from src\ and tests\ into rcode\ */
 
-          /* Use a simple relative output folder (no fancy path mangling) */
           DEFINE VARIABLE outDir AS CHARACTER NO-UNDO INITIAL "rcode".
 
-          /* Create rcode folder if missing */
           OS-CREATE-DIR outDir NO-ERROR.
-
-          /* Pull PROPATH from environment so src;tests;repo;. are visible */
-          IF OS-GETENV("PROPATH") <> ? THEN
-            SESSION:PROPATH = OS-GETENV("PROPATH").
 
           /* Compile all files in a directory (non-recursive) */
           PROCEDURE CompileDir:
             DEFINE INPUT PARAMETER pcDir AS CHARACTER NO-UNDO.
             DEFINE VARIABLE cFile AS CHARACTER NO-UNDO.
 
-            /* Try to open directory listing; if not a dir, just return */
-            INPUT FROM OS-DIR VALUE(pcDir) NO-ECHO NO-MAP NO-ERROR.
-            IF ERROR-STATUS:ERROR THEN DO:
-              INPUT CLOSE.
-              RETURN.
+            DO ON ERROR UNDO, LEAVE:
+              INPUT FROM OS-DIR pcDir NO-ECHO NO-MAP.
             END.
+            IF ERROR-STATUS:ERROR THEN RETURN.
 
             REPEAT:
               IMPORT cFile.
@@ -72,23 +69,21 @@ jobs:
             INPUT CLOSE.
           END PROCEDURE.
 
-          /* Compile these two top-level dirs if they exist */
+          /* Compile these dirs */
           RUN CompileDir("src").
           RUN CompileDir("tests").
 
           QUIT.
           '@
-              $code | Out-File -FilePath compile.p -Encoding ASCII -NoNewline
+                    $code | Out-File -FilePath compile.p -Encoding ASCII -NoNewline
 
       - name: Compile ABL to r-code
         shell: cmd
-        env:
-          PROPATH: "${{ env.PROPATH }}"
         run: |
-          "%DLC%\bin\_progres.exe" -b -p compile.p -q
+          "%DLC%\bin\_progres.exe" -b -pf openedge.pf -p compile.p -q
           if errorlevel 1 exit /b 1
 
-      # Create test-runner.p in ASCII (NO BOM)
+      # --- test-runner.p ---
       - name: Create test-runner.p (ASCII)
         shell: powershell
         run: |
@@ -101,18 +96,13 @@ jobs:
           DEFINE VARIABLE failed  AS INTEGER   NO-UNDO.
           DEFINE VARIABLE cFile   AS CHARACTER NO-UNDO.
 
-          /* Ensure PROPATH uses the env value (src;tests;repo;.) */
-          IF OS-GETENV("PROPATH") <> ? THEN
-            SESSION:PROPATH = OS-GETENV("PROPATH").
-
           OS-CREATE-DIR results NO-ERROR.
 
           /* If tests\ doesn't exist, exit successfully */
-          INPUT FROM OS-DIR VALUE(testDir) NO-ECHO NO-MAP NO-ERROR.
-          IF ERROR-STATUS:ERROR THEN DO:
-            INPUT CLOSE.
-            QUIT.
+          DO ON ERROR UNDO, LEAVE:
+            INPUT FROM OS-DIR testDir NO-ECHO NO-MAP.
           END.
+          IF ERROR-STATUS:ERROR THEN QUIT.
 
           /* Iterate files and run each *.p test */
           REPEAT:
@@ -134,9 +124,10 @@ jobs:
           IF failed > 0 THEN QUIT ERROR.
           QUIT.
           '@
-              $code | Out-File -FilePath test-runner.p -Encoding ASCII -NoNewline
+                    $code | Out-File -FilePath test-runner.p -Encoding ASCII -NoNewline
 
-      - name: (Optional) Create a sample test if none exist
+      # --- Optional: sample test if none exist ---
+      - name: Create sample test if none exist (ASCII)
         shell: powershell
         run: |
           if (-not (Test-Path "tests")) { New-Item -ItemType Directory -Path "tests" | Out-Null }
@@ -149,15 +140,13 @@ jobs:
           IF actual <> expected THEN QUIT ERROR.
           RETURN.
           '@
-            $t | Out-File -FilePath tests\sample_test.p -Encoding ASCII -NoNewline
+                      $t | Out-File -FilePath tests\sample_test.p -Encoding ASCII -NoNewline
           }
 
       - name: Run tests
         shell: cmd
-        env:
-          PROPATH: "${{ env.PROPATH }}"
         run: |
-          "%DLC%\bin\_progres.exe" -b -p test-runner.p -q
+          "%DLC%\bin\_progres.exe" -b -pf openedge.pf -p test-runner.p -q
           if errorlevel 1 exit /b 1
 
       - name: Upload r-code
