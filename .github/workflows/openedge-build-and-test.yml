@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
 
     env:
-      DLC: "C:\\Progress\\OpenEdge"   # 🔧 adjust if different on your machine
+      DLC: "C:\\Progress\\OpenEdge"   # 🔧 change if your install path differs
 
     steps:
       - name: Checkout
@@ -44,7 +44,6 @@ jobs:
           /* compile.p : compile .p and .cls from src\ and tests\ into rcode\ */
 
           DEFINE VARIABLE outDir AS CHARACTER NO-UNDO INITIAL "rcode".
-
           OS-CREATE-DIR outDir NO-ERROR.
 
           /* Compile all files in a directory (non-recursive) */
@@ -80,7 +79,7 @@ jobs:
       - name: Compile ABL to r-code
         shell: cmd
         run: |
-          "%DLC%\bin\_progres.exe" -b -pf openedge.pf -p compile.p -q
+          "%DLC%\bin\_progres.exe" -b -pf "%CD%\openedge.pf" -p "%CD%\compile.p" -q
           if errorlevel 1 exit /b 1
 
       # --- test-runner.p ---
@@ -113,12 +112,12 @@ jobs:
               IF ERROR-STATUS:ERROR THEN failed = failed + 1.
             END.
           END.
-          INPUT CLOSE.
+          INPUT CLOSE;
 
           /* Write a tiny summary */
           OUTPUT TO VALUE(results + "/summary.txt").
           PUT UNFORMATTED SUBSTITUTE("Total: &1  Failed: &2~n", total, failed).
-          OUTPUT CLOSE.
+          OUTPUT CLOSE;
 
           /* Non-zero failures => fail the job */
           IF failed > 0 THEN QUIT ERROR.
@@ -141,12 +140,12 @@ jobs:
           RETURN.
           '@
                       $t | Out-File -FilePath tests\sample_test.p -Encoding ASCII -NoNewline
-          }
+                    }
 
       - name: Run tests
         shell: cmd
         run: |
-          "%DLC%\bin\_progres.exe" -b -pf openedge.pf -p test-runner.p -q
+          "%DLC%\bin\_progres.exe" -b -pf "%CD%\openedge.pf" -p "%CD%\test-runner.p" -q
           if errorlevel 1 exit /b 1
 
       - name: Upload r-code
