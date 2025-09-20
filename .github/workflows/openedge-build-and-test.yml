@@ -36,42 +36,49 @@ jobs:
         shell: powershell
         run: |
           $code = @'
-          /* compile.p : compile .p and .cls under src\ and tests\ into rcode\ */
-          USING Progress.Lang.*.
+          /* compile.p : compile .p and .cls from src\ and tests\ into rcode\ */
 
-          DEFINE VARIABLE outDir AS CHARACTER NO-UNDO.
-          outDir = REPLACE( OS-GETENV("GITHUB_WORKSPACE"), "~\", "/" ) + "/rcode".
+          /* Use a simple relative output folder (no fancy path mangling) */
+          DEFINE VARIABLE outDir AS CHARACTER NO-UNDO INITIAL "rcode".
+
+          /* Create rcode folder if missing */
           OS-CREATE-DIR outDir NO-ERROR.
 
-          /* Ensure PROPATH comes from environment (src;tests;repo;.) */
-          SESSION:PROPATH = OS-GETENV("PROPATH").
+          /* Pull PROPATH from environment so src;tests;repo;. are visible */
+          IF OS-GETENV("PROPATH") <> ? THEN
+            SESSION:PROPATH = OS-GETENV("PROPATH").
 
+          /* Compile all files in a directory (non-recursive) */
           PROCEDURE CompileDir:
-          DEFINE INPUT PARAMETER pcDir AS CHARACTER NO-UNDO.
-          DEFINE VARIABLE cFile AS CHARACTER NO-UNDO.
+            DEFINE INPUT PARAMETER pcDir AS CHARACTER NO-UNDO.
+            DEFINE VARIABLE cFile AS CHARACTER NO-UNDO.
 
-          IF SEARCH(pcDir) = ? THEN RETURN.
-
-          INPUT FROM OS-DIR(pcDir).
-          REPEAT:
-            IMPORT cFile.
-            IF cFile MATCHES "*.p" OR cFile MATCHES "*.cls" THEN DO:
-              COMPILE VALUE(pcDir + "/" + cFile)
-                SAVE INTO outDir
-                NO-ERROR.
-              IF COMPILER:ERROR THEN QUIT ERROR.
+            /* Try to open directory listing; if not a dir, just return */
+            INPUT FROM OS-DIR VALUE(pcDir) NO-ECHO NO-MAP NO-ERROR.
+            IF ERROR-STATUS:ERROR THEN DO:
+              INPUT CLOSE.
+              RETURN.
             END.
-          END.
-          INPUT CLOSE.
+
+            REPEAT:
+              IMPORT cFile.
+              IF cFile MATCHES "*.p" OR cFile MATCHES "*.cls" THEN DO:
+                COMPILE VALUE(pcDir + "/" + cFile)
+                  SAVE INTO outDir
+                  NO-ERROR.
+                IF COMPILER:ERROR THEN QUIT ERROR.
+              END.
+            END.
+            INPUT CLOSE.
           END PROCEDURE.
 
-          /* compile src and tests if present */
+          /* Compile these two top-level dirs if they exist */
           RUN CompileDir("src").
           RUN CompileDir("tests").
 
           QUIT.
           '@
-          $code | Out-File -FilePath compile.p -Encoding ASCII -NoNewline
+              $code | Out-File -FilePath compile.p -Encoding ASCII -NoNewline
 
       - name: Compile ABL to r-code
         shell: cmd
@@ -86,8 +93,7 @@ jobs:
         shell: powershell
         run: |
           $code = @'
-          /* test-runner.p : run every .p under tests\ and fail on error */
-          USING Progress.Lang.*.
+          /* test-runner.p : run every .p under tests\ and fail if any test errors */
 
           DEFINE VARIABLE testDir AS CHARACTER NO-UNDO INITIAL "tests".
           DEFINE VARIABLE results AS CHARACTER NO-UNDO INITIAL "test-results".
@@ -95,12 +101,20 @@ jobs:
           DEFINE VARIABLE failed  AS INTEGER   NO-UNDO.
           DEFINE VARIABLE cFile   AS CHARACTER NO-UNDO.
 
+          /* Ensure PROPATH uses the env value (src;tests;repo;.) */
+          IF OS-GETENV("PROPATH") <> ? THEN
+            SESSION:PROPATH = OS-GETENV("PROPATH").
+
           OS-CREATE-DIR results NO-ERROR.
 
-          /* If no tests directory, exit successfully */
-          IF SEARCH(testDir) = ? THEN QUIT.
+          /* If tests\ doesn't exist, exit successfully */
+          INPUT FROM OS-DIR VALUE(testDir) NO-ECHO NO-MAP NO-ERROR.
+          IF ERROR-STATUS:ERROR THEN DO:
+            INPUT CLOSE.
+            QUIT.
+          END.
 
-          INPUT FROM OS-DIR(testDir).
+          /* Iterate files and run each *.p test */
           REPEAT:
             IMPORT cFile.
             IF cFile MATCHES "*.p" THEN DO:
@@ -111,15 +125,16 @@ jobs:
           END.
           INPUT CLOSE.
 
-          /* Summary */
+          /* Write a tiny summary */
           OUTPUT TO VALUE(results + "/summary.txt").
           PUT UNFORMATTED SUBSTITUTE("Total: &1  Failed: &2~n", total, failed).
           OUTPUT CLOSE.
 
+          /* Non-zero failures => fail the job */
           IF failed > 0 THEN QUIT ERROR.
           QUIT.
           '@
-          $code | Out-File -FilePath test-runner.p -Encoding ASCII -NoNewline
+              $code | Out-File -FilePath test-runner.p -Encoding ASCII -NoNewline
 
       - name: (Optional) Create a sample test if none exist
         shell: powershell
