@@ -9,10 +9,8 @@ jobs:
     runs-on: self-hosted
 
     env:
-      # 🔧 Adjust to your actual OpenEdge install path
-      DLC: C:\Progress\OpenEdge
-      # Add src and tests to PROPATH so COMPILE/RUN can locate code
-      PROPATH: ${{ github.workspace }}\src;${{ github.workspace }}\tests\unit;${{ github.workspace }};.
+      DLC: "C:\\Progress\\OpenEdge"   # <-- quote Windows paths
+      PROPATH: "${{ github.workspace }}\\src;${{ github.workspace }}\\tests;${{ github.workspace }};."
 
     steps:
       - name: Checkout
@@ -33,103 +31,94 @@ jobs:
           if not exist rcode mkdir rcode
           if not exist test-results mkdir test-results
 
-      # ------------------------------------------------------------------
-      # Create compile.p in ASCII (NO BOM).
-      # This compiles .p and .cls in src\ and tests\ into rcode\.
-      # ------------------------------------------------------------------
+      # Create compile.p in ASCII (NO BOM)
       - name: Create compile.p (ASCII)
         shell: powershell
         run: |
           $code = @'
-/* compile.p : compile .p and .cls under src\ and tests\ into rcode\ */
-USING Progress.Lang.*.
+          /* compile.p : compile .p and .cls under src\ and tests\ into rcode\ */
+          USING Progress.Lang.*.
 
-DEFINE VARIABLE outDir AS CHARACTER NO-UNDO.
-outDir = REPLACE( OS-GETENV("GITHUB_WORKSPACE"), "~\", "/" ) + "/rcode".
-OS-CREATE-DIR outDir NO-ERROR.
+          DEFINE VARIABLE outDir AS CHARACTER NO-UNDO.
+          outDir = REPLACE( OS-GETENV("GITHUB_WORKSPACE"), "~\", "/" ) + "/rcode".
+          OS-CREATE-DIR outDir NO-ERROR.
 
-/* Ensure PROPATH comes from environment (src;tests;repo;.) */
-SESSION:PROPATH = OS-GETENV("PROPATH").
+          /* Ensure PROPATH comes from environment (src;tests;repo;.) */
+          SESSION:PROPATH = OS-GETENV("PROPATH").
 
-/* helper: compile all files in a directory (non-recursive) */
-PROCEDURE CompileDir:
-  DEFINE INPUT PARAMETER pcDir AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cFile AS CHARACTER NO-UNDO.
+          PROCEDURE CompileDir:
+          DEFINE INPUT PARAMETER pcDir AS CHARACTER NO-UNDO.
+          DEFINE VARIABLE cFile AS CHARACTER NO-UNDO.
 
-  IF SEARCH(pcDir) = ? THEN RETURN.
+          IF SEARCH(pcDir) = ? THEN RETURN.
 
-  INPUT FROM OS-DIR(pcDir).
-  REPEAT:
-    IMPORT cFile.
-    IF cFile MATCHES "*.p" OR cFile MATCHES "*.cls" THEN DO:
-      COMPILE VALUE(pcDir + "/" + cFile)
-        SAVE INTO outDir
-        NO-ERROR.
-      IF COMPILER:ERROR THEN QUIT ERROR.
-    END.
-  END.
-  INPUT CLOSE.
-END PROCEDURE.
+          INPUT FROM OS-DIR(pcDir).
+          REPEAT:
+            IMPORT cFile.
+            IF cFile MATCHES "*.p" OR cFile MATCHES "*.cls" THEN DO:
+              COMPILE VALUE(pcDir + "/" + cFile)
+                SAVE INTO outDir
+                NO-ERROR.
+              IF COMPILER:ERROR THEN QUIT ERROR.
+            END.
+          END.
+          INPUT CLOSE.
+          END PROCEDURE.
 
-/* compile src and tests if present */
-RUN CompileDir("src").
-RUN CompileDir("tests").
+          /* compile src and tests if present */
+          RUN CompileDir("src").
+          RUN CompileDir("tests").
 
-QUIT.
-'@
-          # Write EXACTLY as ASCII (no BOM)
+          QUIT.
+          '@
           $code | Out-File -FilePath compile.p -Encoding ASCII -NoNewline
 
       - name: Compile ABL to r-code
         shell: cmd
         env:
-          PROPATH: ${{ env.PROPATH }}
+          PROPATH: "${{ env.PROPATH }}"
         run: |
           "%DLC%\bin\_progres.exe" -b -p compile.p -q
           if errorlevel 1 exit /b 1
 
-      # ------------------------------------------------------------------
-      # Create test-runner.p in ASCII (NO BOM).
-      # Runs every .p under tests\ and fails the job if any test fails.
-      # ------------------------------------------------------------------
+      # Create test-runner.p in ASCII (NO BOM)
       - name: Create test-runner.p (ASCII)
         shell: powershell
         run: |
           $code = @'
-/* test-runner.p : run every .p under tests\ and fail on error */
-USING Progress.Lang.*.
+          /* test-runner.p : run every .p under tests\ and fail on error */
+          USING Progress.Lang.*.
 
-DEFINE VARIABLE testDir AS CHARACTER NO-UNDO INITIAL "tests".
-DEFINE VARIABLE results AS CHARACTER NO-UNDO INITIAL "test-results".
-DEFINE VARIABLE total   AS INTEGER   NO-UNDO.
-DEFINE VARIABLE failed  AS INTEGER   NO-UNDO.
-DEFINE VARIABLE cFile   AS CHARACTER NO-UNDO.
+          DEFINE VARIABLE testDir AS CHARACTER NO-UNDO INITIAL "tests".
+          DEFINE VARIABLE results AS CHARACTER NO-UNDO INITIAL "test-results".
+          DEFINE VARIABLE total   AS INTEGER   NO-UNDO.
+          DEFINE VARIABLE failed  AS INTEGER   NO-UNDO.
+          DEFINE VARIABLE cFile   AS CHARACTER NO-UNDO.
 
-OS-CREATE-DIR results NO-ERROR.
+          OS-CREATE-DIR results NO-ERROR.
 
-/* If no tests directory, exit successfully (CI shouldn't fail just for no tests) */
-IF SEARCH(testDir) = ? THEN QUIT.
+          /* If no tests directory, exit successfully */
+          IF SEARCH(testDir) = ? THEN QUIT.
 
-INPUT FROM OS-DIR(testDir).
-REPEAT:
-  IMPORT cFile.
-  IF cFile MATCHES "*.p" THEN DO:
-    total = total + 1.
-    RUN VALUE(testDir + "/" + cFile) NO-ERROR.
-    IF ERROR-STATUS:ERROR THEN failed = failed + 1.
-  END.
-END.
-INPUT CLOSE.
+          INPUT FROM OS-DIR(testDir).
+          REPEAT:
+            IMPORT cFile.
+            IF cFile MATCHES "*.p" THEN DO:
+              total = total + 1.
+              RUN VALUE(testDir + "/" + cFile) NO-ERROR.
+              IF ERROR-STATUS:ERROR THEN failed = failed + 1.
+            END.
+          END.
+          INPUT CLOSE.
 
-/* Summary */
-OUTPUT TO VALUE(results + "/summary.txt").
-PUT UNFORMATTED SUBSTITUTE("Total: &1  Failed: &2~n", total, failed).
-OUTPUT CLOSE.
+          /* Summary */
+          OUTPUT TO VALUE(results + "/summary.txt").
+          PUT UNFORMATTED SUBSTITUTE("Total: &1  Failed: &2~n", total, failed).
+          OUTPUT CLOSE.
 
-IF failed > 0 THEN QUIT ERROR.
-QUIT.
-'@
-          # Write EXACTLY as ASCII (no BOM)
+          IF failed > 0 THEN QUIT ERROR.
+          QUIT.
+          '@
           $code | Out-File -FilePath test-runner.p -Encoding ASCII -NoNewline
 
       - name: (Optional) Create a sample test if none exist
@@ -138,20 +127,20 @@ QUIT.
           if (-not (Test-Path "tests")) { New-Item -ItemType Directory -Path "tests" | Out-Null }
           if ((Get-ChildItem -Path "tests" -Filter *.p -File | Measure-Object).Count -eq 0) {
             $t = @'
-/* tests/sample_test.p : example test */
-DEFINE VARIABLE expected AS INTEGER NO-UNDO INITIAL 4.
-DEFINE VARIABLE actual   AS INTEGER NO-UNDO.
-ASSIGN actual = 2 + 2.
-IF actual <> expected THEN QUIT ERROR.
-RETURN.
-'@
+          /* tests/sample_test.p : example test */
+          DEFINE VARIABLE expected AS INTEGER NO-UNDO INITIAL 4.
+          DEFINE VARIABLE actual   AS INTEGER NO-UNDO.
+          ASSIGN actual = 2 + 2.
+          IF actual <> expected THEN QUIT ERROR.
+          RETURN.
+          '@
             $t | Out-File -FilePath tests\sample_test.p -Encoding ASCII -NoNewline
           }
 
       - name: Run tests
         shell: cmd
         env:
-          PROPATH: ${{ env.PROPATH }}
+          PROPATH: "${{ env.PROPATH }}"
         run: |
           "%DLC%\bin\_progres.exe" -b -p test-runner.p -q
           if errorlevel 1 exit /b 1
