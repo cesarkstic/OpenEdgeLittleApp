@@ -79,7 +79,8 @@ jobs:
       - name: Compile ABL to r-code
         shell: cmd
         run: |
-          "%DLC%\bin\_progres.exe" -b -pf "%CD%/openedge.pf" -p compile.p -q
+          dir /b
+          "%DLC%\bin\_progres.exe" -b -p compile.p -pf openedge.pf -q
           if errorlevel 1 exit /b 1
 
       # --- test-runner.p ---
@@ -145,7 +146,7 @@ jobs:
       - name: Run tests
         shell: cmd
         run: |
-          "%DLC%\bin\_progres.exe" -b -pf "%CD%/openedge.pf" -p test-runner.p -q
+          "%DLC%\bin\_progres.exe" -b -p test-runner.p -pf openedge.pf -q
           if errorlevel 1 exit /b 1
 
       - name: Upload r-code
