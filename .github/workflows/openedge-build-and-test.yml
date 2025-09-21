@@ -152,7 +152,7 @@ jobs:
         shell: powershell
         run: |
           $code = @'
-          MESSAGE "HELLO" VIEW-AS ALERT-BOX.
+          MESSAGE "HELLO PEOPLE" VIEW-AS ALERT-BOX.
           QUIT.
           '@
               $code | Out-File -FilePath hello.p -Encoding ASCII -NoNewline
