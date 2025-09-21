@@ -1,4 +1,4 @@
-name: OpenEdge Build & Test (Self-Hosted, ASCII)
+name: OpenEdge Build & Test (Self-Hosted, ASCII, stable -p)
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
 
     env:
-      DLC: "C:\\Progress\\OpenEdge"   # 🔧 adjust if your OpenEdge path is different
+      DLC: "C:\\Progress\\OpenEdge"   # change if needed
 
     steps:
       - name: Checkout
@@ -30,7 +30,7 @@ jobs:
           if not exist rcode mkdir rcode
           if not exist test-results mkdir test-results
 
-      # --- compile.p ---
+      # --- compile.p (ASCII) ---
       - name: Create compile.p (ASCII)
         shell: powershell
         run: |
@@ -70,7 +70,7 @@ jobs:
           '@
                     $code | Out-File -FilePath compile.p -Encoding ASCII -NoNewline
 
-      # --- test-runner.p ---
+      # --- test-runner.p (ASCII) ---
       - name: Create test-runner.p (ASCII)
         shell: powershell
         run: |
@@ -89,7 +89,7 @@ jobs:
           DO ON ERROR UNDO, LEAVE:
             INPUT FROM OS-DIR testDir NO-ECHO NO-MAP.
           END.
-          IF ERROR-STATUS:ERROR THEN QUIT.
+          IF ERROR-STATUS:ERROR THEN QUIT;
 
           /* Iterate files and run each *.p test */
           REPEAT:
@@ -100,12 +100,12 @@ jobs:
               IF ERROR-STATUS:ERROR THEN failed = failed + 1.
             END.
           END.
-          INPUT CLOSE.
+          INPUT CLOSE;
 
           /* Write a tiny summary */
           OUTPUT TO VALUE(results + "/summary.txt").
           PUT UNFORMATTED SUBSTITUTE("Total: &1  Failed: &2~n", total, failed).
-          OUTPUT CLOSE.
+          OUTPUT CLOSE;
 
           /* Non-zero failures => fail the job */
           IF failed > 0 THEN QUIT ERROR.
@@ -130,21 +130,28 @@ jobs:
                       $t | Out-File -FilePath tests\sample_test.p -Encoding ASCII -NoNewline
                     }
 
-      # --- Parameter files (ASCII, include -p inside) ---
-      - name: Create build.pf
-        shell: powershell
+      # --- PFs created with CMD ECHO to guarantee CRLF ASCII and clean tokens ---
+      - name: Create build.pf (PROPATH + -p)
+        shell: cmd
         run: |
-          Set-Content -Path build.pf -Value "-propath src;tests;.`n-p compile.p" -Encoding ASCII
+          > build.pf (echo -propath src;tests;.)
+          >> build.pf echo -p compile.p
+          type build.pf
 
-      - name: Create test.pf
-        shell: powershell
+      - name: Create test.pf (PROPATH + -p)
+        shell: cmd
         run: |
-          Set-Content -Path test.pf -Value "-propath src;tests;.`n-p test-runner.p" -Encoding ASCII
+          > test.pf (echo -propath src;tests;.)
+          >> test.pf echo -p test-runner.p
+          type test.pf
 
       # --- Compile ---
       - name: Compile ABL to r-code
         shell: cmd
         run: |
+          echo === RUN COMPILE ===
+          dir /b
+          type build.pf
           "%DLC%\bin\_progres.exe" -b -pf build.pf -q
           if errorlevel 1 exit /b 1
 
@@ -152,6 +159,9 @@ jobs:
       - name: Run tests
         shell: cmd
         run: |
+          echo === RUN TESTS ===
+          dir /b
+          type test.pf
           "%DLC%\bin\_progres.exe" -b -pf test.pf -q
           if errorlevel 1 exit /b 1
 
