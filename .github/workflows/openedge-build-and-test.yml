@@ -35,16 +35,18 @@ jobs:
         shell: powershell
         run: |
           $code = @'
-          /* compile.p : compile .p and .cls from src\ and tests\ into rcode\ */
+          /* compile.p : Recursively compile .p and .cls from root and tests into rcode/ */
 
           DEFINE VARIABLE outDir AS CHARACTER NO-UNDO INITIAL "rcode".
+          DEFINE VARIABLE cFile  AS CHARACTER NO-UNDO.
+          DEFINE VARIABLE cFull  AS CHARACTER NO-UNDO.
+
+          /* Ensure rcode dir exists */
           OS-CREATE-DIR outDir NO-ERROR.
 
-          /* Compile all files in a directory (non-recursive) */
+          /* Recursive compile */
           PROCEDURE CompileDir:
             DEFINE INPUT PARAMETER pcDir AS CHARACTER NO-UNDO.
-            DEFINE VARIABLE cFile AS CHARACTER NO-UNDO.
-            DEFINE VARIABLE cFull AS CHARACTER NO-UNDO.
 
             DO ON ERROR UNDO, LEAVE:
               INPUT FROM OS-DIR (pcDir) NO-ECHO NO-MAP.
@@ -54,13 +56,14 @@ jobs:
             REPEAT:
               IMPORT cFile.
 
-              /* Skip dot entries */
+              /* skip dot entries */
               IF cFile = "." OR cFile = ".." THEN NEXT.
 
               ASSIGN cFull = pcDir + "/" + cFile.
 
-              /* If directory, recurse */
-              IF OS-DIR(cFull) = TRUE THEN DO:
+              /* If this entry is a directory, recurse */
+              FILE-INFO:FILE-NAME = cFull.
+              IF FILE-INFO:FILE-TYPE = "D" THEN DO:
                 RUN CompileDir(cFull).
               END.
               ELSE DO:
@@ -68,16 +71,20 @@ jobs:
                   COMPILE VALUE(cFull)
                     SAVE INTO outDir
                     NO-ERROR.
-                  IF COMPILER:ERROR THEN RETURN ERROR.
+                  IF COMPILER:ERROR THEN DO:
+                    MESSAGE "Compile failed:" cFull VIEW-AS ALERT-BOX ERROR.
+                    RETURN ERROR.
+                  END.
                 END.
               END.
             END.
+
             INPUT CLOSE.
           END PROCEDURE.
 
-          /* Compile these dirs */
+          /* Compile root (.) and tests if present */
           RUN CompileDir(".").
-          RUN CompileDir("test/unit").
+          RUN CompileDir("tests").
 
           QUIT.
           '@

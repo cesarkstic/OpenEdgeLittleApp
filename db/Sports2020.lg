@@ -2333,3 +2333,21 @@
 [2025/09/21@15:31:58.023-0500] P-15720      T-2840  I SRV     1: (7129)  Usr 2 set name to cdcas. 
 [2025/09/21@15:31:58.023-0500] P-15720      T-2840  I SRV     1: (17961) User 2 set tty to LAPTOP-DJBHA2A4. 
 [2025/09/21@15:31:58.046-0500] P-15720      T-2840  I SRV     1: (7129)  Usr 2 set name to cdcas. 
+[2025/09/21@15:42:23.800-0500] P-21416      T-16820 I SQLSRV2 3: (19262) SQL Server 12.8.00 started, configuration: "Sports2020.virtualconfig" 
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19552) SQL Server with server num 2 logged in.
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19265) "C:/OpenEdge/WRK/OpenEdgeLittleApp/db/Sports2020" started on IPv4 port 3001 for address 127.0.0.1, pid 21416 (0x000053a8).
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19263) Thread stack size:  1024000  (bytes).
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19270) DLC from ENVIRONMENT VARIABLE is: C:\Progress\OpenEdge
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19270) WRKDIR from REGISTRY is: C:\OpenEdge\WRK\
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19270) JDKHOME from ENVIRONMENT VARIABLE is: C:\Users\cdcas\AppData\Local\Programs\ECLIPS~1\JDK-21~1.9-H\
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19270) JREHOME from ENVIRONMENT VARIABLE is: C:\Users\cdcas\AppData\Local\Programs\ECLIPS~1\JDK-21~1.9-H\
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19270) CLASSPATH from DEFAULT is: 
+[2025/09/21@15:42:23.808-0500] P-21416      T-16820 I SQLSRV2 3: (19271) PROSQL_LOCKWAIT_TIMEOUT value is: 5 seconds
+[2025/09/21@15:42:23.844-0500] P-21416      T-16820 I SQLSRV2 3: (19260) server control: JVM Parameter Monitoring Service start status= 0
+[2025/09/21@15:42:23.868-0500] P-21416      T-22644 I SQLSRV2 3: (19243) sql_engine: SQL service thread for client begun
+[2025/09/21@15:42:23.869-0500] P-21416      T-22644 I SQLSRV2 3: (19288) service name: JVM Param Service : Thread 22644 is executing.
+[2025/09/21@15:42:24.580-0500] P-21416      T-16148 I SQLSRV2 3: (8873)  Login usernum 4, remote SQL client. 
+[2025/09/21@15:42:24.590-0500] P-21416      T-16148 I SQLSRV2 3: (17961) User 4 set tty to kubernetes:58742. 
+[2025/09/21@15:42:24.590-0500] P-21416      T-16148 I SQLSRV2 3: (7129)  Usr 4 set name to cdcas. 
+[2025/09/21@15:42:24.590-0500] P-21416      T-16148 I SQLSRV2 3: (19205) SQLLockWaitTimeout 5 
+[2025/09/21@15:42:24.596-0500] P-21416      T-16148 I SQLSRV2 3: (19198) Login by user 4. Using TCP/IP IPV4 address 127.0.0.1
