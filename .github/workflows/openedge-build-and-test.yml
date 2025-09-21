@@ -137,6 +137,34 @@ jobs:
           > build.pf echo -propath .;src;tests
           type build.pf
 
+      # 0) Show environment + where we are
+      - name: Debug env & CWD
+        shell: cmd
+        run: |
+          echo DLC=%DLC%
+          echo GITHUB_WORKSPACE=%GITHUB_WORKSPACE%
+          echo CD=%CD%
+          where "%DLC%\bin\_progres.exe"
+          dir /b
+
+      # 1) Create a tiny hello.p in ASCII
+      - name: Create hello.p (ASCII)
+        shell: powershell
+        run: |
+          $code = @'
+          MESSAGE "HELLO" VIEW-AS ALERT-BOX.
+          QUIT.
+          '@
+              $code | Out-File -FilePath hello.p -Encoding ASCII -NoNewline
+
+      # 2) Run _progres with -p hello.p only (no PF)
+      - name: Sanity run hello.p with -p (no PF)
+        shell: cmd
+        run: |
+          echo === Sanity: _progres -b -p hello.p ===
+          "%DLC%\bin\_progres.exe" -b -p hello.p
+
+
       # Compile — note: -p FIRST, forward slashes, no quotes
       - name: Compile ABL to r-code
         shell: cmd
