@@ -173,7 +173,7 @@ jobs:
           cd /d "%GITHUB_WORKSPACE%"
           dir /b
           type build.pf
-          "%DLC%\bin\_progres.exe" -b -p ./compile.p -pf ./build.pf -q
+          "%DLC%\bin\_progres.exe" -b -p compile.p -pf build.pf -q
           if errorlevel 1 exit /b 1
 
       # Create a test PF the same way (only PROPATH)
