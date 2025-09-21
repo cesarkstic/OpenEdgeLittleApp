@@ -2351,3 +2351,10 @@
 [2025/09/21@15:42:24.590-0500] P-21416      T-16148 I SQLSRV2 3: (7129)  Usr 4 set name to cdcas. 
 [2025/09/21@15:42:24.590-0500] P-21416      T-16148 I SQLSRV2 3: (19205) SQLLockWaitTimeout 5 
 [2025/09/21@15:42:24.596-0500] P-21416      T-16148 I SQLSRV2 3: (19198) Login by user 4. Using TCP/IP IPV4 address 127.0.0.1
+[2025/09/21@15:52:47.569-0500] P-22364      T-8524  I SRV     5: (452)   Login by cdcas on CON:. 
+[2025/09/21@15:52:47.592-0500] P-22364      T-8524  I SRV     5: (19552) Server with server num 3 logged in. 
+[2025/09/21@15:52:47.592-0500] P-22364      T-8524  I SRV     5: (5646)  Started on port 3002 using TCP IPV4 address 127.0.0.1, pid 22364. 
+[2025/09/21@15:52:48.502-0500] P-22364      T-8524  I SRV     5: (742)   Login usernum 6, userid cdcas client type ABL , on LAPTOP-DJBHA2A4 using TCP/IP IPV4 address 127.0.0.1. 
+[2025/09/21@15:52:48.502-0500] P-22364      T-8524  I SRV     5: (7129)  Usr 6 set name to cdcas. 
+[2025/09/21@15:52:48.502-0500] P-22364      T-8524  I SRV     5: (17961) User 6 set tty to LAPTOP-DJBHA2A4. 
+[2025/09/21@15:52:48.523-0500] P-22364      T-8524  I SRV     5: (7129)  Usr 6 set name to cdcas. 

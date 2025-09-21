@@ -107,10 +107,9 @@ jobs:
 
           /* If tests\ doesn't exist, exit successfully */
           DO ON ERROR UNDO, LEAVE:
-            INPUT FROM OS-DIR testDir NO-ECHO NO-MAP.
+            INPUT FROM OS-DIR (testDir) NO-ECHO NO-MAP.
           END.
-          IF ERROR-STATUS:ERROR THEN QUIT;
-
+          IF ERROR-STATUS:ERROR THEN RETURN ERROR.
           /* Iterate files and run each *.p test */
           REPEAT:
             IMPORT cFile.
@@ -120,15 +119,15 @@ jobs:
               IF ERROR-STATUS:ERROR THEN failed = failed + 1.
             END.
           END.
-          INPUT CLOSE;
+          INPUT CLOSE.
 
           /* Write a tiny summary */
           OUTPUT TO VALUE(results + "/summary.txt").
           PUT UNFORMATTED SUBSTITUTE("Total: &1  Failed: &2~n", total, failed).
-          OUTPUT CLOSE;
+          OUTPUT CLOSE.
 
           /* Non-zero failures => fail the job */
-          IF failed > 0 THEN QUIT ERROR.
+          IF failed > 0 THEN RETURN ERROR.
           QUIT.
           '@
                     $code | Out-File -FilePath test-runner.p -Encoding ASCII -NoNewline
