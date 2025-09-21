@@ -130,13 +130,6 @@ jobs:
                       $t | Out-File -FilePath tests\sample_test.p -Encoding ASCII -NoNewline
                     }
 
-      # Create a very simple PF: ONLY the PROPATH
-      - name: Create build.pf
-        shell: cmd
-        run: |
-          > build.pf echo -propath .;src;tests
-          type build.pf
-
       # 0) Show environment + where we are
       - name: Debug env & CWD
         shell: cmd
@@ -164,34 +157,22 @@ jobs:
           echo === Sanity: _progres -b -p hello.p ===
           "%DLC%\bin\_progres.exe" -b -p hello.p
 
-
-      # Compile — note: -p FIRST, forward slashes, no quotes
       - name: Compile ABL to r-code
         shell: cmd
         run: |
-          echo === RUN COMPILE ===
+          echo === RUN COMPILE (no PF) ===
           cd /d "%GITHUB_WORKSPACE%"
           dir /b
-          type build.pf
-          "%DLC%\bin\_progres.exe" -b -p compile.p -pf build.pf -q
+          "%DLC%\bin\_progres.exe" -b -p compile.p
           if errorlevel 1 exit /b 1
 
-      # Create a test PF the same way (only PROPATH)
-      - name: Create test.pf
-        shell: cmd
-        run: |
-          > test.pf echo -propath .;src;tests
-          type test.pf
-
-      # Run tests — again: -p FIRST, forward slashes, no quotes
       - name: Run tests
         shell: cmd
         run: |
-          echo === RUN TESTS ===
+          echo === RUN TESTS (no PF) ===
           cd /d "%GITHUB_WORKSPACE%"
           dir /b
-          type test.pf
-          "%DLC%\bin\_progres.exe" -b -p ./test-runner.p -pf ./test.pf -q
+          "%DLC%\bin\_progres.exe" -b -p test-runner.p
           if errorlevel 1 exit /b 1
 
       - name: Upload r-code
