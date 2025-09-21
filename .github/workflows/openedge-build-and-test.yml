@@ -130,19 +130,19 @@ jobs:
                       $t | Out-File -FilePath tests\sample_test.p -Encoding ASCII -NoNewline
                     }
 
-      # --- PFs created with CMD ECHO to guarantee CRLF ASCII and clean tokens ---
-      - name: Create build.pf (PROPATH + -p)
+      # Variant with explicit path in -p (also keeps PROPATH first)
+      - name: Create build.pf (explicit -p path)
         shell: cmd
         run: |
-          > build.pf echo -p compile.p
-          >> build.pf (echo -propath src;tests;.)          
+          > build.pf echo -propath .;src;tests
+          >> build.pf echo -p "%GITHUB_WORKSPACE:/=\%/compile.p"
           type build.pf
 
-      - name: Create test.pf (PROPATH + -p)
+      - name: Create test.pf (explicit -p path)
         shell: cmd
         run: |
-          > test.pf echo -p test-runner.p
-          >> test.pf (echo -propath src;tests;.)          
+          > test.pf echo -propath .;src;tests
+          >> test.pf echo -p "%GITHUB_WORKSPACE:/=\%/test-runner.p"
           type test.pf
 
       # --- Compile ---
