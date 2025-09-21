@@ -44,6 +44,7 @@ jobs:
           PROCEDURE CompileDir:
             DEFINE INPUT PARAMETER pcDir AS CHARACTER NO-UNDO.
             DEFINE VARIABLE cFile AS CHARACTER NO-UNDO.
+            DEFINE VARIABLE cFull AS CHARACTER NO-UNDO.
 
             DO ON ERROR UNDO, LEAVE:
               INPUT FROM OS-DIR pcDir NO-ECHO NO-MAP.
@@ -52,19 +53,31 @@ jobs:
 
             REPEAT:
               IMPORT cFile.
-              IF cFile MATCHES "*.p" OR cFile MATCHES "*.cls" THEN DO:
-                COMPILE VALUE(pcDir + "/" + cFile)
-                  SAVE INTO outDir
-                  NO-ERROR.
-                IF COMPILER:ERROR THEN QUIT ERROR.
+
+              /* Skip dot entries */
+              IF cFile = "." OR cFile = ".." THEN NEXT.
+
+              ASSIGN cFull = pcDir + "/" + cFile.
+
+              /* If directory, recurse */
+              IF OS-DIR(cFull) = TRUE THEN DO:
+                RUN CompileDir(cFull).
+              END.
+              ELSE DO:
+                IF cFile MATCHES "*.p" OR cFile MATCHES "*.cls" THEN DO:
+                  COMPILE VALUE(cFull)
+                    SAVE INTO outDir
+                    NO-ERROR.
+                  IF COMPILER:ERROR THEN QUIT ERROR.
+                END.
               END.
             END.
             INPUT CLOSE.
           END PROCEDURE.
 
           /* Compile these dirs */
-          RUN CompileDir("src").
-          RUN CompileDir("tests").
+          RUN CompileDir(".").
+          RUN CompileDir("test/unit").
 
           QUIT.
           '@
