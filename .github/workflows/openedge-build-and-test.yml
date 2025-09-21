@@ -47,7 +47,7 @@ jobs:
             DEFINE VARIABLE cFull AS CHARACTER NO-UNDO.
 
             DO ON ERROR UNDO, LEAVE:
-              INPUT FROM OS-DIR pcDir NO-ECHO NO-MAP.
+              INPUT FROM OS-DIR (pcDir) NO-ECHO NO-MAP.
             END.
             IF ERROR-STATUS:ERROR THEN RETURN.
 
@@ -68,7 +68,7 @@ jobs:
                   COMPILE VALUE(cFull)
                     SAVE INTO outDir
                     NO-ERROR.
-                  IF COMPILER:ERROR THEN QUIT ERROR.
+                  IF COMPILER:ERROR THEN RETURN ERROR.
                 END.
               END.
             END.
