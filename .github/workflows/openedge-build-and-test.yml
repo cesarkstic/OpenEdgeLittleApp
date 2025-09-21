@@ -134,15 +134,15 @@ jobs:
       - name: Create build.pf (PROPATH + -p)
         shell: cmd
         run: |
-          > build.pf (echo -propath src;tests;.)
-          >> build.pf echo -p compile.p
+          > build.pf echo -p compile.p
+          >> build.pf (echo -propath src;tests;.)          
           type build.pf
 
       - name: Create test.pf (PROPATH + -p)
         shell: cmd
         run: |
-          > test.pf (echo -propath src;tests;.)
-          >> test.pf echo -p test-runner.p
+          > test.pf echo -p test-runner.p
+          >> test.pf (echo -propath src;tests;.)          
           type test.pf
 
       # --- Compile ---
@@ -152,7 +152,7 @@ jobs:
           echo === RUN COMPILE ===
           dir /b
           type build.pf
-          "%DLC%\bin\_progres.exe -p compile.p -b -pf build.pf -q"
+          "%DLC%\bin\_progres.exe" "-b -pf build.pf -q"
           if errorlevel 1 exit /b 1
 
       # --- Run tests ---
