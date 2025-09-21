@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
 
     env:
-      DLC: "C:\\Progress\\OpenEdge"   # 🔧 change if your install path differs
+      DLC: "C:\\Progress\\OpenEdge"   # 🔧 adjust if your OpenEdge path is different
 
     steps:
       - name: Checkout
@@ -29,12 +29,6 @@ jobs:
         run: |
           if not exist rcode mkdir rcode
           if not exist test-results mkdir test-results
-
-      # --- Parameter file for PROPATH ---
-      - name: Create openedge.pf
-        shell: powershell
-        run: |
-          Set-Content -Path openedge.pf -Value '-propath src;tests;.' -Encoding ASCII
 
       # --- compile.p ---
       - name: Create compile.p (ASCII)
@@ -76,13 +70,6 @@ jobs:
           '@
                     $code | Out-File -FilePath compile.p -Encoding ASCII -NoNewline
 
-      - name: Compile ABL to r-code
-        shell: cmd
-        run: |
-          dir /b
-          "%DLC%\bin\_progres.exe" -b -p compile.p -pf openedge.pf -q
-          if errorlevel 1 exit /b 1
-
       # --- test-runner.p ---
       - name: Create test-runner.p (ASCII)
         shell: powershell
@@ -113,12 +100,12 @@ jobs:
               IF ERROR-STATUS:ERROR THEN failed = failed + 1.
             END.
           END.
-          INPUT CLOSE;
+          INPUT CLOSE.
 
           /* Write a tiny summary */
           OUTPUT TO VALUE(results + "/summary.txt").
           PUT UNFORMATTED SUBSTITUTE("Total: &1  Failed: &2~n", total, failed).
-          OUTPUT CLOSE;
+          OUTPUT CLOSE.
 
           /* Non-zero failures => fail the job */
           IF failed > 0 THEN QUIT ERROR.
@@ -143,10 +130,29 @@ jobs:
                       $t | Out-File -FilePath tests\sample_test.p -Encoding ASCII -NoNewline
                     }
 
+      # --- Parameter files (ASCII, include -p inside) ---
+      - name: Create build.pf
+        shell: powershell
+        run: |
+          Set-Content -Path build.pf -Value "-propath src;tests;.`n-p compile.p" -Encoding ASCII
+
+      - name: Create test.pf
+        shell: powershell
+        run: |
+          Set-Content -Path test.pf -Value "-propath src;tests;.`n-p test-runner.p" -Encoding ASCII
+
+      # --- Compile ---
+      - name: Compile ABL to r-code
+        shell: cmd
+        run: |
+          "%DLC%\bin\_progres.exe" -b -pf build.pf -q
+          if errorlevel 1 exit /b 1
+
+      # --- Run tests ---
       - name: Run tests
         shell: cmd
         run: |
-          "%DLC%\bin\_progres.exe" -b -p test-runner.p -pf openedge.pf -q
+          "%DLC%\bin\_progres.exe" -b -pf test.pf -q
           if errorlevel 1 exit /b 1
 
       - name: Upload r-code
