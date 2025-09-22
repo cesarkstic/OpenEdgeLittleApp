@@ -156,7 +156,11 @@ jobs:
           echo DLC=%DLC%
           echo GITHUB_WORKSPACE=%GITHUB_WORKSPACE%
           echo CD=%CD%
-          where "%DLC%\bin\_progres.exe"
+          echo -- List DLC\bin
+          dir "%DLC%\bin"
+          echo -- Find _progres.exe under DLC\bin (recursive)
+          where /R "%DLC%\bin" _progres.exe
+          echo -- Repo root listing
           dir /b
 
       # 1) Create a tiny hello.p in ASCII
