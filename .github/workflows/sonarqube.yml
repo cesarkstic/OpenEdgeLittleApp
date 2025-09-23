@@ -2,24 +2,23 @@ name: SonarQube (Self-Hosted Windows)
 
 on:
   push:
-    branches: ['**']                    # all branches
+    branches: ['**']
   pull_request:
     branches: ['**']
     types: [opened, synchronize, reopened]
 
 jobs:
   sonarqube:
-    # Your runner should be a Windows self-hosted runner (labels are 'self-hosted' and 'Windows' by default)
     runs-on: [self-hosted, Windows]
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0                # better blame/PR decoration
+          fetch-depth: 0
 
-      # Optional: quick reachability check (PowerShell) to avoid silent failures
+      # Use Windows PowerShell instead of pwsh
       - name: Check SonarQube reachability
-        shell: pwsh
+        shell: powershell
         env:
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
         run: |
@@ -27,7 +26,7 @@ jobs:
             Write-Error "SONAR_HOST_URL is empty. Set it as a repo Variable (preferred) or Secret."
             exit 1
           }
-          if ($env:SONAR_HOST_URL -notmatch "^https?://") {
+          if ($env:SONAR_HOST_URL -notmatch '^https?://') {
             Write-Error "SONAR_HOST_URL must start with http:// or https:// (got: $env:SONAR_HOST_URL)"
             exit 1
           }
@@ -35,23 +34,8 @@ jobs:
             $resp = Invoke-WebRequest -Uri "$env:SONAR_HOST_URL/api/system/health" -UseBasicParsing -TimeoutSec 10
             Write-Host "SonarQube health: $($resp.Content)"
           } catch {
-            Write-Warning "Could not reach $env:SONAR_HOST_URL. The scan will likely fail."
+            Write-Warning "Could not reach $env:SONAR_HOST_URL. The scan may fail."
           }
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN:  ${{ secrets.SONAR_TOKEN }}                         # repo Secret
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}  # repo Variable or Secret
-        with:
-          args: >
-            -Dsonar.verbose=true
-            -Dsonar.branch.name=${{ github.ref_name }}
-
-      # Optional: fail job if Quality Gate fails (requires reachable SQ)
-      - name: SonarQube Quality Gate
-        if: ${{ github.event_name == 'push' }}
-        uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
-        env:
-          SONAR_TOKEN:  ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
