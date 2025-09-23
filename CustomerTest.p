@@ -36,6 +36,10 @@ for each ttCustomer:
     disp ttCustomer with 1 column.
 end.
 
+return.
+
+message "HI".
+
 CATCH e AS Exceptions.NotFoundExc :
    message e:GetMessage(1).     
 END CATCH.
