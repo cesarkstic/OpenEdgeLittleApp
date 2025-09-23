@@ -1,4 +1,4 @@
-name: SonarQube (Self-Hosted Windows, manual scanner)
+name: SonarQube (CE, Self-Hosted Windows)
 
 on:
   push:
@@ -16,27 +16,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Ensure Java 17 for the scanner
-      - name: Set up Java 17 (Temurin)
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
 
-      # (Optional) Reachability check
-      - name: Check SonarQube reachability
+      # (Optional) sanity check: URL must be just host:port (no path)
+      - name: Validate SONAR_HOST_URL
         shell: powershell
         env:
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
         run: |
-          if (-not $env:SONAR_HOST_URL) { Write-Error "SONAR_HOST_URL is empty"; exit 1 }
-          if ($env:SONAR_HOST_URL -notmatch '^https?://') { Write-Error "SONAR_HOST_URL must start with http:// or https://"; exit 1 }
-          try {
-            $resp = Invoke-WebRequest -Uri "$env:SONAR_HOST_URL/api/system/status" -UseBasicParsing -TimeoutSec 10
-            Write-Host "SQ status: $($resp.Content)"
-          } catch { Write-Warning "Reachability check failed; proceeding anyway." }
+          if (-not $env:SONAR_HOST_URL) { throw "SONAR_HOST_URL is empty" }
+          $u = [Uri]$env:SONAR_HOST_URL
+          if ($u.AbsolutePath -ne "/") { throw "Remove path from SONAR_HOST_URL. Use e.g. http://localhost:9000" }
+          Write-Host "Using $($u.AbsoluteUri)"
 
-      # Download and unzip the scanner with a .zip filename
+      # Install scanner (or skip if you put it on PATH already)
       - name: Install SonarScanner CLI
         shell: powershell
         run: |
@@ -47,29 +44,15 @@ jobs:
           Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
           if (Test-Path $destDir) { Remove-Item -Recurse -Force $destDir }
           Expand-Archive -LiteralPath $zipPath -DestinationPath $destDir -Force
-          # find the extracted folder name (e.g., sonar-scanner-7.2.0.5079-windows-x64)
           $folder = Get-ChildItem $destDir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
-          echo "SCANNER_DIR=$($folder.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "SCANNER_DIR=$($folder.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      # Run the scanner directly
-      - name: Run SonarScanner
+      - name: Run SonarScanner (Community Edition)
         shell: powershell
         env:
           SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
         run: |
-          $scannerBat = Join-Path $env:SCANNER_DIR 'bin\sonar-scanner.bat'
-          if (-not (Test-Path $scannerBat)) { Write-Error "Scanner not found at $scannerBat"; exit 1 }
-          & $scannerBat `
+          & "$env:SCANNER_DIR\bin\sonar-scanner.bat" `
             -D"sonar.host.url=$env:SONAR_HOST_URL" `
-            -D"sonar.login=$env:SONAR_TOKEN" `
-            -D"sonar.verbose=true" `
-            -D"sonar.branch.name=${{ github.ref_name }}"
-
-      # Optional: Quality Gate (requires server access from runner)
-      - name: SonarQube Quality Gate
-        if: ${{ github.event_name == 'push' }}
-        uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
-        env:
-          SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
+            -D"sonar.verbose=true"
