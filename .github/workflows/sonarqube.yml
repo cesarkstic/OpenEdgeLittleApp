@@ -1,4 +1,4 @@
-name: SonarQube (Self-Hosted Windows)
+name: SonarQube (Self-Hosted Windows, manual scanner)
 
 on:
   push:
@@ -16,45 +16,60 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check SonarQube reachability (Windows PowerShell)
+      # Ensure Java 17 for the scanner
+      - name: Set up Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # (Optional) Reachability check
+      - name: Check SonarQube reachability
         shell: powershell
         env:
-            SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
-        run: |
-            if (-not $env:SONAR_HOST_URL) { Write-Error "SONAR_HOST_URL is empty"; exit 1 }
-
-            $statusUrl = "$env:SONAR_HOST_URL/api/system/status"
-            try {
-            $resp = Invoke-WebRequest -Uri $statusUrl -UseBasicParsing -MaximumRedirection 0 -TimeoutSec 10 -ErrorAction Stop
-            $json = $resp.Content | ConvertFrom-Json
-            Write-Host "SonarQube status: $($json.status)"
-            } catch {
-            # Fallback: maybe redirected to HTML UI – try to read the 'data-server-status' attribute
-            try {
-                $root = Invoke-WebRequest -Uri $env:SONAR_HOST_URL -UseBasicParsing -TimeoutSec 10
-                if ($root.Content -match 'data-server-status="([^"]+)"') {
-                Write-Host "SonarQube status (from UI): $($Matches[1])"
-                } else {
-                Write-Warning "Reached SQ but couldn’t parse status. HTTP $($root.StatusCode)"
-                }
-            } catch {
-                Write-Error "Could not reach $env:SONAR_HOST_URL"; exit 1
-            }
-            }
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN:  ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
-        with:
-          args: >
-            -Dsonar.verbose=true
-            -Dsonar.branch.name=${{ github.ref_name }}
+        run: |
+          if (-not $env:SONAR_HOST_URL) { Write-Error "SONAR_HOST_URL is empty"; exit 1 }
+          if ($env:SONAR_HOST_URL -notmatch '^https?://') { Write-Error "SONAR_HOST_URL must start with http:// or https://"; exit 1 }
+          try {
+            $resp = Invoke-WebRequest -Uri "$env:SONAR_HOST_URL/api/system/status" -UseBasicParsing -TimeoutSec 10
+            Write-Host "SQ status: $($resp.Content)"
+          } catch { Write-Warning "Reachability check failed; proceeding anyway." }
 
+      # Download and unzip the scanner with a .zip filename
+      - name: Install SonarScanner CLI
+        shell: powershell
+        run: |
+          $version = '7.2.0.5079'
+          $zipUrl  = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$version-windows-x64.zip"
+          $zipPath = "$env:RUNNER_TEMP\sonar-scanner.zip"
+          $destDir = "$env:RUNNER_TEMP\sonar-scanner"
+          Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+          if (Test-Path $destDir) { Remove-Item -Recurse -Force $destDir }
+          Expand-Archive -LiteralPath $zipPath -DestinationPath $destDir -Force
+          # find the extracted folder name (e.g., sonar-scanner-7.2.0.5079-windows-x64)
+          $folder = Get-ChildItem $destDir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+          echo "SCANNER_DIR=$($folder.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      # Run the scanner directly
+      - name: Run SonarScanner
+        shell: powershell
+        env:
+          SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
+        run: |
+          $scannerBat = Join-Path $env:SCANNER_DIR 'bin\sonar-scanner.bat'
+          if (-not (Test-Path $scannerBat)) { Write-Error "Scanner not found at $scannerBat"; exit 1 }
+          & $scannerBat `
+            -D"sonar.host.url=$env:SONAR_HOST_URL" `
+            -D"sonar.login=$env:SONAR_TOKEN" `
+            -D"sonar.verbose=true" `
+            -D"sonar.branch.name=${{ github.ref_name }}"
+
+      # Optional: Quality Gate (requires server access from runner)
       - name: SonarQube Quality Gate
         if: ${{ github.event_name == 'push' }}
         uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
         env:
-          SONAR_TOKEN:  ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
