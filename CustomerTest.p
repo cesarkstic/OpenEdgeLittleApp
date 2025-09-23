@@ -26,7 +26,7 @@ CONNECT -db VALUE("db/sports2020.db") -1 no-error.
 {datasets/dsCustomer.i}
 
 
-define variable oCustomer as business.CustomerBO no-undo.
+define variable oCustomer as business.CustomerBO.
 
 oCustomer = new business.CustomerBO ().
 
