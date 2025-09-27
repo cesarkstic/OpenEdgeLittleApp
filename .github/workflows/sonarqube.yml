@@ -15,7 +15,8 @@ jobs:
     runs-on: self-hosted
     defaults:
       run:
-        shell: pwsh
+        shell: powershell
+
     env:
       SONAR_HOST_URL: http://localhost:9000
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -29,12 +30,13 @@ jobs:
       - name: Cache Sonar user cache
         uses: actions/cache@v4
         with:
-          path: ${{ env.USERPROFILE }}\.sonar\cache
+          path: $env:USERPROFILE\.sonar\cache
           key: sonar-${{ runner.os }}-${{ hashFiles('**/sonar-project.properties') }}
           restore-keys: |
             sonar-${{ runner.os }}-
 
       - name: Download SonarScanner CLI (Windows x64)
+        shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
           $version = '7.2.0.5079'
@@ -44,9 +46,8 @@ jobs:
           New-Item -ItemType Directory -Path $dir | Out-Null
           $url = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-$version-windows-x64.zip"
 
-          # Compatibility: -UseBasicParsing for Windows PowerShell 5.1
-          $iwrParams = @{ Uri = $url; OutFile = $zip }
-          if ($PSVersionTable.PSVersion.Major -lt 6) { $iwrParams.UseBasicParsing = $true }
+          # PS5.1 needs -UseBasicParsing
+          $iwrParams = @{ Uri = $url; OutFile = $zip; UseBasicParsing = $true }
           Invoke-WebRequest @iwrParams
 
           Expand-Archive -LiteralPath $zip -DestinationPath $dir -Force
@@ -54,21 +55,20 @@ jobs:
           "SCANNER_DIR=$($extracted.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Validate environment
+        shell: powershell
         run: |
           if (-not $env:SONAR_HOST_URL) { throw "SONAR_HOST_URL is empty" }
           if (-not $env:SONAR_TOKEN)    { throw "SONAR_TOKEN is empty (set repository secret SONAR_TOKEN)" }
           Write-Host "Using $env:SONAR_HOST_URL"
 
       - name: Run SonarQube Scanner
+        shell: powershell
         run: |
           & "$env:SCANNER_DIR\bin\sonar-scanner.bat"
 
       - name: Show CE task URL
         if: always()
+        shell: powershell
         run: |
           $taskFile = Join-Path $pwd ".scannerwork\report-task.txt"
-          if (Test-Path $taskFile) {
-            Get-Content $taskFile | Write-Host
-          } else {
-            Write-Host "report-task.txt not found"
-          }
+          if (Test-Path $taskFile) { Get-Content $taskFile | Write-Host } else { Write-Host "report-task.txt not found" }
