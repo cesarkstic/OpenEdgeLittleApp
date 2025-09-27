@@ -1,58 +1,70 @@
-name: SonarQube (CE, Self-Hosted Windows)
+name: SonarQube
 
 on:
   push:
-    branches: ['**']
+    branches: [ "**" ]
   pull_request:
-    branches: ['**']
-    types: [opened, synchronize, reopened]
+    branches: [ "**" ]
+
+permissions:
+  contents: read
 
 jobs:
-  sonarqube:
-    runs-on: [self-hosted, Windows]
+  analyze:
+    name: SonarQube Scan
+    runs-on: self-hosted
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      SONAR_HOST_URL: http://localhost:9000
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
+      - name: Cache Sonar user cache (~/.sonar/cache)
+        uses: actions/cache@v4
         with:
-          distribution: temurin
-          java-version: '17'
+          path: |
+            ${{ env.USERPROFILE }}\.sonar\cache
+          key: sonar-${{ runner.os }}-${{ hashFiles('**/sonar-project.properties') }}
+          restore-keys: |
+            sonar-${{ runner.os }}-
 
-      # (Optional) sanity check: URL must be just host:port (no path)
-      - name: Validate SONAR_HOST_URL
-        shell: powershell
-        env:
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
+      - name: Download SonarScanner CLI (Windows x64)
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = '7.2.0.5079'
+          $zip = "$env:RUNNER_TEMP\sonar-scanner-$version-windows-x64.zip"
+          $dir = "$env:RUNNER_TEMP\sonar-scanner"
+          if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
+          New-Item -ItemType Directory -Path $dir | Out-Null
+          $url = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-$version-windows-x64.zip"
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          Expand-Archive -LiteralPath $zip -DestinationPath $dir
+          $extracted = Get-ChildItem $dir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+          echo "SCANNER_DIR=$($extracted.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Validate environment
         run: |
           if (-not $env:SONAR_HOST_URL) { throw "SONAR_HOST_URL is empty" }
-          $u = [Uri]$env:SONAR_HOST_URL
-          if ($u.AbsolutePath -ne "/") { throw "Remove path from SONAR_HOST_URL. Use e.g. http://localhost:9000" }
-          Write-Host "Using $($u.AbsoluteUri)"
+          if (-not $env:SONAR_TOKEN)    { throw "SONAR_TOKEN is empty (set repository secret SONAR_TOKEN)" }
+          Write-Host "Using $env:SONAR_HOST_URL"
 
-      # Install scanner (or skip if you put it on PATH already)
-      - name: Install SonarScanner CLI
-        shell: powershell
+      - name: Run SonarQube Scanner
         run: |
-          $version = '7.2.0.5079'
-          $zipUrl  = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$version-windows-x64.zip"
-          $zipPath = "$env:RUNNER_TEMP\sonar-scanner.zip"
-          $destDir = "$env:RUNNER_TEMP\sonar-scanner"
-          Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
-          if (Test-Path $destDir) { Remove-Item -Recurse -Force $destDir }
-          Expand-Archive -LiteralPath $zipPath -DestinationPath $destDir -Force
-          $folder = Get-ChildItem $destDir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
-          "SCANNER_DIR=$($folder.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          & "$env:SCANNER_DIR\bin\sonar-scanner.bat"
 
-      - name: Run SonarScanner (Community Edition)
-        shell: powershell
-        env:
-          SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
+      - name: Show CE task URL
+        if: always()
         run: |
-          & "$env:SCANNER_DIR\bin\sonar-scanner.bat" `
-            -D"sonar.host.url=$env:SONAR_HOST_URL" `
-            -D"sonar.verbose=true"
+          $taskFile = Join-Path $pwd ".scannerwork\report-task.txt"
+          if (Test-Path $taskFile) {
+            Get-Content $taskFile | Write-Host
+          } else {
+            Write-Host "report-task.txt not found"
+          }
