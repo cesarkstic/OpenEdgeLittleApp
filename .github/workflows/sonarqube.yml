@@ -2,9 +2,9 @@ name: SonarQube
 
 on:
   push:
-    branches: [ "**" ]
+    branches: ["**"]
   pull_request:
-    branches: [ "**" ]
+    branches: ["**"]
 
 permissions:
   contents: read
@@ -26,11 +26,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache Sonar user cache (~/.sonar/cache)
+      - name: Cache Sonar user cache
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ env.USERPROFILE }}\.sonar\cache
+          path: ${{ env.USERPROFILE }}\.sonar\cache
           key: sonar-${{ runner.os }}-${{ hashFiles('**/sonar-project.properties') }}
           restore-keys: |
             sonar-${{ runner.os }}-
@@ -39,15 +38,20 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $version = '7.2.0.5079'
-          $zip = "$env:RUNNER_TEMP\sonar-scanner-$version-windows-x64.zip"
-          $dir = "$env:RUNNER_TEMP\sonar-scanner"
+          $zip = Join-Path $env:RUNNER_TEMP "sonar-scanner-$version-windows-x64.zip"
+          $dir = Join-Path $env:RUNNER_TEMP "sonar-scanner"
           if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
           New-Item -ItemType Directory -Path $dir | Out-Null
           $url = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-$version-windows-x64.zip"
-          Invoke-WebRequest -Uri $url -OutFile $zip
-          Expand-Archive -LiteralPath $zip -DestinationPath $dir
-          $extracted = Get-ChildItem $dir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
-          echo "SCANNER_DIR=$($extracted.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+          # Compatibility: -UseBasicParsing for Windows PowerShell 5.1
+          $iwrParams = @{ Uri = $url; OutFile = $zip }
+          if ($PSVersionTable.PSVersion.Major -lt 6) { $iwrParams.UseBasicParsing = $true }
+          Invoke-WebRequest @iwrParams
+
+          Expand-Archive -LiteralPath $zip -DestinationPath $dir -Force
+          $extracted = Get-ChildItem $dir -Directory | Select-Object -First 1
+          "SCANNER_DIR=$($extracted.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Validate environment
         run: |
