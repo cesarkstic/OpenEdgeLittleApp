@@ -1,58 +1,16 @@
-name: SonarQube (CE, Self-Hosted Windows)
+sonar.projectKey=OpenEdgeLittleApp
+sonar.projectName=OpenEdgeLittleApp
+sonar.sources=.
 
-on:
-  push:
-    branches: ['**']
-  pull_request:
-    branches: ['**']
-    types: [opened, synchronize, reopened]
+# OpenEdge
+sonar.oe.file.suffixes=p,w,i,cls
 
-jobs:
-  sonarqube:
-    runs-on: [self-hosted, Windows]
+# List ALL folders that hold .i / .p / .w / .cls (plus project root ".")
+# Windows:
+sonar.oe.propath=.;datasets;business;data;entities;exceptions;test;test/unit
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+# If you run on Linux/macOS, switch separators:
+# sonar.oe.propath=.:datasets:business:data:entities:exceptions:test:test/unit
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      # (Optional) sanity check: URL must be just host:port (no path)
-      - name: Validate SONAR_HOST_URL
-        shell: powershell
-        env:
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
-        run: |
-          if (-not $env:SONAR_HOST_URL) { throw "SONAR_HOST_URL is empty" }
-          $u = [Uri]$env:SONAR_HOST_URL
-          if ($u.AbsolutePath -ne "/") { throw "Remove path from SONAR_HOST_URL. Use e.g. http://localhost:9000" }
-          Write-Host "Using $($u.AbsoluteUri)"
-
-      # Install scanner (or skip if you put it on PATH already)
-      - name: Install SonarScanner CLI
-        shell: powershell
-        run: |
-          $version = '7.2.0.5079'
-          $zipUrl  = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$version-windows-x64.zip"
-          $zipPath = "$env:RUNNER_TEMP\sonar-scanner.zip"
-          $destDir = "$env:RUNNER_TEMP\sonar-scanner"
-          Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
-          if (Test-Path $destDir) { Remove-Item -Recurse -Force $destDir }
-          Expand-Archive -LiteralPath $zipPath -DestinationPath $destDir -Force
-          $folder = Get-ChildItem $destDir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
-          "SCANNER_DIR=$($folder.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Run SonarScanner (Community Edition)
-        shell: powershell
-        env:
-          SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || secrets.SONAR_HOST_URL }}
-        run: |
-          & "$env:SCANNER_DIR\bin\sonar-scanner.bat" `
-            -D"sonar.host.url=$env:SONAR_HOST_URL" `
-            -D"sonar.verbose=true"
+# (Optional) help Sonar classify tests
+sonar.tests=test;test/unit
