@@ -1,21 +1,15 @@
-name: SonarQube
+name: SonarQube (Windows, PowerShell)
 
 on:
   push:
-    branches: ["**"]
+    branches: [ main ]
   pull_request:
-    branches: ["**"]
-
-permissions:
-  contents: read
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  analyze:
-    name: SonarQube Scan
-    runs-on: self-hosted
-    defaults:
-      run:
-        shell: powershell
+  sonarqube:
+    runs-on: windows-latest
 
     env:
       SONAR_HOST_URL: http://localhost:9000
@@ -27,18 +21,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache Sonar user cache
-        uses: actions/cache@v4
-        with:
-          path: $env:USERPROFILE\.sonar\cache
-          key: sonar-${{ runner.os }}-${{ hashFiles('**/sonar-project.properties') }}
-          restore-keys: |
-            sonar-${{ runner.os }}-
+      - name: Verify required env vars
+        shell: powershell
+        run: |
+          if (-not $env:SONAR_HOST_URL) { throw "SONAR_HOST_URL is empty" }
+          if (-not $env:SONAR_TOKEN)    { throw "SONAR_TOKEN is empty" }
+          "Using $env:SONAR_HOST_URL"
 
       - name: Download SonarScanner CLI (Windows x64)
         shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
+          # Use TLS 1.2 for compatibility
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
           $version = '7.2.0.5079'
           $zip = Join-Path $env:RUNNER_TEMP "sonar-scanner-$version-windows-x64.zip"
           $dir = Join-Path $env:RUNNER_TEMP "sonar-scanner"
@@ -46,29 +42,24 @@ jobs:
           New-Item -ItemType Directory -Path $dir | Out-Null
           $url = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-$version-windows-x64.zip"
 
-          # PS5.1 needs -UseBasicParsing
-          $iwrParams = @{ Uri = $url; OutFile = $zip; UseBasicParsing = $true }
+          # PS 5.1 needs -UseBasicParsing
+          $iwrParams = @{ Uri = $url; OutFile = $zip }
+          if ($PSVersionTable.PSVersion.Major -lt 6) { $iwrParams.UseBasicParsing = $true }
           Invoke-WebRequest @iwrParams
 
           Expand-Archive -LiteralPath $zip -DestinationPath $dir -Force
           $extracted = Get-ChildItem $dir -Directory | Select-Object -First 1
           "SCANNER_DIR=$($extracted.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Validate environment
+      - name: Show scanner path (debug)
         shell: powershell
         run: |
-          if (-not $env:SONAR_HOST_URL) { throw "SONAR_HOST_URL is empty" }
-          if (-not $env:SONAR_TOKEN)    { throw "SONAR_TOKEN is empty (set repository secret SONAR_TOKEN)" }
-          Write-Host "Using $env:SONAR_HOST_URL"
+          Write-Host "SCANNER_DIR = $env:SCANNER_DIR"
+          Get-ChildItem "$env:SCANNER_DIR\bin"
 
-      - name: Run SonarQube Scanner
+      - name: Run SonarScanner (uses sonar-project.properties)
         shell: powershell
         run: |
-          & "$env:SCANNER_DIR\bin\sonar-scanner.bat"
-
-      - name: Show CE task URL
-        if: always()
-        shell: powershell
-        run: |
-          $taskFile = Join-Path $pwd ".scannerwork\report-task.txt"
-          if (Test-Path $taskFile) { Get-Content $taskFile | Write-Host } else { Write-Host "report-task.txt not found" }
+          & "$env:SCANNER_DIR\bin\sonar-scanner.bat" `
+            -D"sonar.host.url=$env:SONAR_HOST_URL" `
+            -D"sonar.login=$env:SONAR_TOKEN"
