@@ -26,7 +26,7 @@ CONNECT -db VALUE("db/sports2020.db") -1 no-error.
 {datasets/dsCustomer.i}
 
 
-define variable oCustomer as business.CustomerBO no-undo.
+define variable oCustomer as business.CustomerBO.
 
 oCustomer = new business.CustomerBO ().
 
@@ -35,6 +35,10 @@ oCustomer:GetByCustNum (3225, dataset dsCustomer by-reference).
 for each ttCustomer:
     disp ttCustomer with 1 column.
 end.
+
+return.
+
+message "HI".
 
 CATCH e AS Exceptions.NotFoundExc :
    message e:GetMessage(1).     

@@ -1,0 +1,65 @@
+name: SonarQube (Windows, PowerShell)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  sonarqube:
+    runs-on: windows-latest
+
+    env:
+      SONAR_HOST_URL: http://localhost:9000
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify required env vars
+        shell: powershell
+        run: |
+          if (-not $env:SONAR_HOST_URL) { throw "SONAR_HOST_URL is empty" }
+          if (-not $env:SONAR_TOKEN)    { throw "SONAR_TOKEN is empty" }
+          "Using $env:SONAR_HOST_URL"
+
+      - name: Download SonarScanner CLI (Windows x64)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Use TLS 1.2 for compatibility
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+          $version = '7.2.0.5079'
+          $zip = Join-Path $env:RUNNER_TEMP "sonar-scanner-$version-windows-x64.zip"
+          $dir = Join-Path $env:RUNNER_TEMP "sonar-scanner"
+          if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
+          New-Item -ItemType Directory -Path $dir | Out-Null
+          $url = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-$version-windows-x64.zip"
+
+          # PS 5.1 needs -UseBasicParsing
+          $iwrParams = @{ Uri = $url; OutFile = $zip }
+          if ($PSVersionTable.PSVersion.Major -lt 6) { $iwrParams.UseBasicParsing = $true }
+          Invoke-WebRequest @iwrParams
+
+          Expand-Archive -LiteralPath $zip -DestinationPath $dir -Force
+          $extracted = Get-ChildItem $dir -Directory | Select-Object -First 1
+          "SCANNER_DIR=$($extracted.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Show scanner path (debug)
+        shell: powershell
+        run: |
+          Write-Host "SCANNER_DIR = $env:SCANNER_DIR"
+          Get-ChildItem "$env:SCANNER_DIR\bin"
+
+      - name: Run SonarScanner (uses sonar-project.properties)
+        shell: powershell
+        run: |
+          & "$env:SCANNER_DIR\bin\sonar-scanner.bat" `
+            -D"sonar.host.url=$env:SONAR_HOST_URL" `
+            -D"sonar.login=$env:SONAR_TOKEN"
